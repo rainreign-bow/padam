@@ -1,0 +1,1430 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Berita - Dinas Damkar</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       1. DESIGN TOKENS
+       ============================================================ */
+    :root {
+      --navy-900:    #0B1D38;
+      --navy-800:    #102A4C;
+      --navy-700:    #173A66;
+      --navy-600:    #215083;
+      --steel:       #4A7FB0;
+      --steel-light: #7FA3C7;
+
+      --ink:         #152238;
+      --muted:       #64748B;
+      --line:        #E3E9F1;
+      --page:        #F4F6F9;
+      --glass:       rgba(255, 255, 255, 0.92);
+    }
+
+    /* ============================================================
+       2. BASE
+       ============================================================ */
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background-color: var(--page);
+      background-image:
+        radial-gradient(circle at 10% -8%, rgba(23, 58, 102, 0.055), transparent 42%),
+        radial-gradient(circle at 94% 4%, rgba(23, 58, 102, 0.04), transparent 38%),
+        linear-gradient(rgba(16, 42, 76, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 42, 76, 0.03) 1px, transparent 1px);
+      background-size: auto, auto, 56px 56px, 56px 56px;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--page); }
+    ::-webkit-scrollbar-thumb { background: #B9C7D8; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--navy-700); }
+
+    /* ============================================================
+       3. SCROLL PROGRESS
+       ============================================================ */
+    #scrollProgress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0;
+      background: linear-gradient(90deg, var(--navy-600), var(--navy-900));
+      z-index: 9999;
+      transition: width 0.1s linear;
+    }
+
+    /* ============================================================
+       4. NAVBAR
+       ============================================================ */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--glass);
+      backdrop-filter: blur(16px) saturate(170%);
+      -webkit-backdrop-filter: blur(16px) saturate(170%);
+      border-bottom: 1px solid var(--line);
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+    }
+    #navbar.scrolled {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 10px 28px -18px rgba(11, 29, 56, 0.35);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      height: 76px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      color: #fff;
+      background: linear-gradient(140deg, var(--navy-700), var(--navy-900));
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.6);
+      flex-shrink: 0;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #47546B;
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      transition: color 0.25s ease, background 0.25s ease;
+    }
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      left: 14px; right: 14px; bottom: 3px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--navy-700);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .nav-item:hover,
+    .nav-item.active {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.055);
+    }
+    .nav-item:hover::after,
+    .nav-item.active::after { transform: scaleX(1); }
+
+    .nav-item i.fa-chevron-down {
+      font-size: 9px;
+      opacity: 0.55;
+      transition: transform 0.3s ease;
+    }
+    .nav-item:hover i.fa-chevron-down { transform: rotate(180deg); }
+
+    .nav-item-cta {
+      background: var(--navy-800);
+      color: #fff !important;
+      padding: 10px 18px;
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.7);
+    }
+    .nav-item-cta::after { display: none; }
+    .nav-item-cta:hover {
+      background: var(--navy-700);
+      color: #fff !important;
+    }
+
+    .nav-dd-wrap { position: relative; }
+    .nav-dd {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      min-width: 250px;
+      padding: 8px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow:
+        0 24px 48px -22px rgba(11, 29, 56, 0.35),
+        0 4px 12px -6px rgba(11, 29, 56, 0.08);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%) translateY(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+      z-index: 100;
+    }
+    .nav-dd::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: -12px;
+      height: 12px;
+    }
+    .nav-dd-sm { min-width: 215px; }
+    .nav-dd-wrap:hover .nav-dd,
+    .nav-dd-wrap:focus-within .nav-dd {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dd-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #47546B;
+      text-decoration: none;
+      transition: background 0.22s ease, color 0.22s ease;
+    }
+    .dd-item i {
+      width: 16px;
+      font-size: 0.72rem;
+      color: #9AA7B8;
+      text-align: center;
+      transition: color 0.22s ease;
+    }
+    .dd-item:hover {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.06);
+    }
+    .dd-item:hover i { color: var(--navy-700); }
+
+    .hamburger-btn {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--line);
+      transition: background 0.25s ease, border-color 0.25s ease;
+      flex-shrink: 0;
+    }
+    .hamburger-btn:hover {
+      background: rgba(16, 42, 76, 0.05);
+      border-color: #CBD9E8;
+    }
+    .h-line {
+      position: absolute;
+      width: 18px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--navy-800);
+      transition: transform 0.35s ease, opacity 0.25s ease;
+    }
+    .h-line:nth-child(1) { transform: translateY(-6px); }
+    .h-line:nth-child(3) { transform: translateY(6px); }
+    #mobileMenuBtn.open .h-line:nth-child(1) { transform: rotate(45deg); }
+    #mobileMenuBtn.open .h-line:nth-child(2) { transform: translateX(30px); opacity: 0; }
+    #mobileMenuBtn.open .h-line:nth-child(3) { transform: rotate(-45deg); }
+
+    .mobile-menu-wrap {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.45s ease, opacity 0.35s ease;
+    }
+    .mobile-menu-wrap.open { max-height: 900px; opacity: 1; }
+    .mobile-menu-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 14px 0 18px;
+      border-top: 1px solid var(--line);
+    }
+    .m-item, .m-toggle {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #47546B;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.22s ease, color 0.22s ease;
+    }
+    .m-item i, .m-toggle i:not(.chev) {
+      width: 18px;
+      font-size: 0.85rem;
+      color: var(--navy-700);
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .m-item:hover, .m-toggle:hover {
+      background: rgba(16, 42, 76, 0.055);
+      color: var(--navy-800);
+    }
+    .m-item-cta {
+      justify-content: center;
+      margin-top: 6px;
+      color: #fff !important;
+      background: var(--navy-800);
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.6);
+    }
+    .m-item-cta i { color: #fff !important; }
+    .m-item-cta:hover { background: var(--navy-700); color: #fff !important; }
+    .m-toggle .chev {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #9AA7B8;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .m-toggle.open .chev { transform: rotate(180deg); color: var(--navy-700); }
+    .m-sub {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 4px 0 6px 28px;
+    }
+    .m-sub a {
+      padding: 9px 14px;
+      border-radius: 6px;
+      border-left: 2px solid transparent;
+      font-size: 0.83rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+    }
+    .m-sub a:hover {
+      background: rgba(16, 42, 76, 0.05);
+      color: var(--navy-800);
+      border-left-color: var(--navy-700);
+    }
+
+    /* ============================================================
+       5. HAIRLINE
+       ============================================================ */
+    .hairline {
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        var(--line) 12%,
+        var(--line) 88%,
+        transparent 100%);
+    }
+
+    /* ============================================================
+       6. FADE UP
+       ============================================================ */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up { animation: fadeInUp 0.7s ease-out both; }
+    .delay-1 { animation-delay: 0.08s; }
+    .delay-2 { animation-delay: 0.16s; }
+    .delay-3 { animation-delay: 0.24s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ============================================================
+       7. SECTION HEADING
+       ============================================================ */
+    .section-heading {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+    .section-heading::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--navy-800), var(--navy-600));
+    }
+
+    /* ============================================================
+       8. FEATURED HERO
+       ============================================================ */
+    .featured-hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      background: var(--navy-900);
+      min-height: 420px;
+      display: flex;
+      align-items: flex-end;
+      box-shadow: 0 24px 60px -30px rgba(11, 29, 56, 0.5);
+    }
+    @media (min-width: 768px) {
+      .featured-hero { min-height: 480px; }
+    }
+    .featured-hero .hero-img {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.7s ease;
+    }
+    .featured-hero:hover .hero-img {
+      transform: scale(1.04);
+    }
+    .featured-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg,
+        rgba(11,29,56,0.15) 0%,
+        rgba(11,29,56,0.6) 45%,
+        rgba(11,29,56,0.96) 100%);
+      z-index: 2;
+    }
+    .featured-content {
+      position: relative;
+      z-index: 5;
+      padding: 2rem 1.75rem;
+      width: 100%;
+    }
+    @media (min-width: 768px) {
+      .featured-content { padding: 3rem 2.75rem; }
+    }
+
+    /* ============================================================
+       9. CATEGORY TAG
+       ============================================================ */
+    .cat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.62rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .cat-kebakaran    { background: rgba(153, 27, 27, 0.1); color: #991B1B; }
+    .cat-penyelamatan { background: rgba(15, 81, 50, 0.1); color: #0F5132; }
+    .cat-diklat       { background: rgba(76, 29, 149, 0.1); color: #4C1D95; }
+    .cat-edukasi      { background: rgba(146, 64, 14, 0.1); color: #92400E; }
+    .cat-prestasi     { background: rgba(133, 100, 4, 0.12); color: #856404; }
+    .cat-pengumuman   { background: rgba(21, 94, 117, 0.1); color: #155E75; }
+
+    /* Reading chip */
+    .reading-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      background: rgba(16, 42, 76, 0.06);
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--navy-700);
+    }
+
+    /* ============================================================
+       10. NEWS CARD
+       ============================================================ */
+    .news-card {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .news-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--navy-800), var(--navy-600));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+      z-index: 2;
+    }
+    .news-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 42px -24px rgba(11, 29, 56, 0.32);
+      border-color: #CBD9E8;
+    }
+    .news-card:hover::before { transform: scaleX(1); }
+
+    .news-img-wrap {
+      position: relative;
+      overflow: hidden;
+      background: var(--page);
+    }
+    .news-img-wrap img {
+      transition: transform 0.6s ease;
+    }
+    .news-card:hover .news-img-wrap img {
+      transform: scale(1.05);
+    }
+
+    /* ============================================================
+       11. FILTER TAB
+       ============================================================ */
+    .filter-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #47546B;
+      cursor: pointer;
+      transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease;
+    }
+    .filter-tab:hover {
+      background: rgba(16, 42, 76, 0.04);
+      border-color: #CBD9E8;
+      color: var(--navy-800);
+    }
+    .filter-tab.active {
+      background: var(--navy-800);
+      color: #fff;
+      border-color: var(--navy-800);
+    }
+    .filter-tab .tab-count {
+      background: rgba(16, 42, 76, 0.08);
+      color: var(--navy-700);
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+    .filter-tab.active .tab-count {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    /* ============================================================
+       12. SEARCH
+       ============================================================ */
+    .search-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 4px 4px 4px 14px;
+      max-width: 300px;
+      width: 100%;
+      transition: border-color 0.22s ease, box-shadow 0.22s ease;
+    }
+    .search-wrap:focus-within {
+      border-color: var(--navy-700);
+      box-shadow: 0 0 0 3px rgba(23, 58, 102, 0.08);
+    }
+    .search-wrap input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 0.85rem;
+      color: var(--ink);
+      padding: 8px 4px;
+    }
+    .search-wrap input::placeholder { color: #94a3b8; }
+    .search-wrap i.fa-search {
+      color: #94a3b8;
+      font-size: 0.82rem;
+    }
+    .search-btn {
+      width: 34px; height: 34px;
+      border-radius: 4px;
+      background: var(--navy-800);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem;
+      transition: background 0.22s ease;
+      flex-shrink: 0;
+    }
+    .search-btn:hover { background: var(--navy-700); }
+
+    /* ============================================================
+       13. LOAD MORE
+       ============================================================ */
+    .load-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 28px;
+      background: #fff;
+      border: 2px solid var(--navy-700);
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: var(--navy-700);
+      transition: background 0.25s ease, color 0.25s ease;
+      cursor: pointer;
+    }
+    .load-more-btn:hover {
+      background: var(--navy-800);
+      color: #fff;
+      border-color: var(--navy-800);
+    }
+
+    /* ============================================================
+       14. TRENDING ITEM
+       ============================================================ */
+    .trending-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 8px;
+      border-radius: 8px;
+      transition: background 0.22s ease;
+      cursor: pointer;
+    }
+    .trending-item:hover {
+      background: rgba(16, 42, 76, 0.04);
+    }
+    .trending-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--navy-800);
+      flex-shrink: 0;
+      min-width: 32px;
+      text-align: center;
+    }
+    .trending-item.top-1 .trending-num { color: #991B1B; }
+
+    /* ============================================================
+       15. SIDEBAR CARD
+       ============================================================ */
+    .sidebar-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    /* ============================================================
+       16. QUOTE
+       ============================================================ */
+    .quote-banner {
+      background: linear-gradient(140deg, var(--navy-800), var(--navy-900));
+      border-radius: 10px;
+      box-shadow: 0 24px 48px -22px rgba(11, 29, 56, 0.5);
+    }
+
+    /* ============================================================
+       17. FOOTER
+       ============================================================ */
+    .site-footer {
+      background: linear-gradient(165deg, #102A4C 0%, #0B1D38 100%);
+      color: #E6EDF5;
+    }
+
+    /* ============================================================
+       18. RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1023px) {
+      .nav-inner { height: 68px; }
+      .logo-badge { width: 40px; height: 40px; font-size: 0.95rem; border-radius: 9px; }
+    }
+  </style>
+</head>
+
+<body class="antialiased">
+
+  <div id="scrollProgress"></div>
+
+  <!-- ================= NAVBAR ================= -->
+  <header id="navbar" class="site-header">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <nav class="nav-inner" aria-label="Navigasi utama">
+
+        <a href="index.html" class="brand-group">
+          <div class="logo-badge">
+            <i class="fas fa-fire-extinguisher"></i>
+          </div>
+          <div class="leading-tight">
+            <span class="block text-sm sm:text-base font-extrabold tracking-tight text-slate-800">Dinas Damkar</span>
+            <span class="block text-[8px] sm:text-[9px] font-semibold text-[#173A66] uppercase tracking-[0.15em] sm:tracking-[0.18em]">Pemadam &amp; Penyelamat</span>
+          </div>
+        </a>
+
+        <div class="hidden lg:flex items-center gap-1">
+          <a href="index.html" class="nav-item">Beranda</a>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item" type="button">
+              Profil PD <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd">
+              <a href="profile.html" class="dd-item"><i class="fas fa-user-tie"></i><span>Profil Pimpinan</span></a>
+              <a href="sejarah.html" class="dd-item"><i class="fas fa-book-open"></i><span>Sejarah</span></a>
+              <a href="struktur.html" class="dd-item"><i class="fas fa-sitemap"></i><span>Struktur Organisasi</span></a>
+              <a href="visimisi.html" class="dd-item"><i class="fas fa-compass"></i><span>Visi dan Misi</span></a>
+              <a href="tugas.html" class="dd-item"><i class="fas fa-list-check"></i><span>Tugas dan Fungsi</span></a>
+            </div>
+          </div>
+
+          <a href="program.html" class="nav-item">Program</a>
+          <a href="agenda.html" class="nav-item">Agenda Pimpinan</a>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item active" type="button">
+              Publikasi <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd nav-dd-sm">
+              <a href="berita.html" class="dd-item"><i class="fas fa-newspaper"></i><span>Berita</span></a>
+              <a href="detail.html" class="dd-item"><i class="fas fa-file-lines"></i><span>Detail Berita</span></a>
+            </div>
+          </div>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item" type="button">
+              Dokumentasi <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd nav-dd-sm">
+              <a href="galeri.html" class="dd-item"><i class="fas fa-images"></i><span>Galeri Foto</span></a>
+              <a href="video.html" class="dd-item"><i class="fas fa-video"></i><span>Video Kegiatan</span></a>
+            </div>
+          </div>
+
+          <a href="kritik.html" class="nav-item nav-item-cta">Kritik &amp; Saran</a>
+        </div>
+
+        <button id="mobileMenuBtn" class="lg:hidden hamburger-btn" aria-label="Buka menu" aria-expanded="false">
+          <span class="h-line"></span>
+          <span class="h-line"></span>
+          <span class="h-line"></span>
+        </button>
+      </nav>
+    </div>
+
+    <div id="mobileMenu" class="mobile-menu-wrap lg:hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mobile-menu-inner">
+          <a href="index.html" class="m-item"><i class="fas fa-home"></i> Beranda</a>
+
+          <div class="m-toggle" data-toggle="m-profil">
+            <i class="fas fa-building"></i> <span>Profil PD</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-profil" class="hidden m-sub">
+            <a href="profile.html">Profil Pimpinan</a>
+            <a href="sejarah.html">Sejarah</a>
+            <a href="struktur.html">Struktur Organisasi</a>
+            <a href="visimisi.html">Visi &amp; Misi</a>
+            <a href="tugas.html">Tugas &amp; Fungsi</a>
+          </div>
+
+          <a href="program.html" class="m-item"><i class="fas fa-clipboard-list"></i> Program</a>
+          <a href="agenda.html" class="m-item"><i class="fas fa-calendar-alt"></i> Agenda Pimpinan</a>
+
+          <div class="m-toggle" data-toggle="m-publikasi">
+            <i class="fas fa-bullhorn"></i> <span>Publikasi</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-publikasi" class="hidden m-sub">
+            <a href="berita.html">Berita</a>
+            <a href="detail.html">Detail Berita</a>
+          </div>
+
+          <div class="m-toggle" data-toggle="m-dok">
+            <i class="fas fa-camera"></i> <span>Dokumentasi</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-dok" class="hidden m-sub">
+            <a href="galeri.html">Galeri Foto</a>
+            <a href="video.html">Video Kegiatan</a>
+          </div>
+
+          <a href="kritik.html" class="m-item m-item-cta"><i class="fas fa-comment-dots"></i> Kritik &amp; Saran</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN ================= -->
+  <main class="w-full relative">
+
+    <!-- PAGE HEADER -->
+    <section class="pt-12 pb-6 animate-fade-up">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 mb-5">
+          <a href="index.html" class="hover:text-[#173A66] transition flex items-center gap-1.5"><i class="fas fa-home"></i> Beranda</a>
+          <i class="fas fa-chevron-right text-[9px] text-slate-400"></i>
+          <span class="text-slate-500">Publikasi</span>
+          <i class="fas fa-chevron-right text-[9px] text-slate-400"></i>
+          <span class="text-[#173A66]">Berita</span>
+        </nav>
+
+        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800">
+          Kabar <span class="text-[#173A66]">Terbaru</span>
+        </h1>
+        <p class="text-slate-500 mt-3 max-w-2xl text-sm md:text-base">
+          Berita, informasi, dan kegiatan terkini dari Dinas Pemadam Kebakaran dan Penyelamatan.
+        </p>
+      </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
+      <div class="hairline"></div>
+    </div>
+
+    <!-- ============ FEATURED ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+      <div class="featured-hero animate-fade-up">
+        <div class="hero-img" style="background-image: url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2000&auto=format&fit=crop');"></div>
+
+        <div class="featured-content">
+          <div class="flex flex-wrap items-center gap-2 mb-4">
+            <span class="cat-tag cat-kebakaran"><i class="fas fa-fire"></i> Kebakaran</span>
+            <span class="reading-chip"><i class="far fa-clock"></i> 5 menit baca</span>
+            <span class="reading-chip"><i class="far fa-eye"></i> 1.2k dibaca</span>
+          </div>
+
+          <h2 class="text-2xl md:text-4xl font-extrabold text-white leading-tight mb-4 max-w-3xl" style="font-family: 'Playfair Display', serif;">
+            Simulasi Evakuasi Gedung Bertingkat: 150 Peserta, Satu Tujuan, Nol Korban
+          </h2>
+
+          <p class="text-slate-200 text-sm md:text-base leading-relaxed max-w-2xl mb-6">
+            Puluhan personel damkar bersama ratusan penghuni gedung mengikuti simulasi evakuasi darurat berskala besar. Skenario kebakaran lantai 12 diuji dengan waktu respons di bawah 5 menit.
+          </p>
+
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-white/15 border border-white/25 flex items-center justify-center text-white text-xs font-extrabold backdrop-blur">
+                HN
+              </div>
+              <div>
+                <p class="text-white font-bold text-sm">Humas Dinas Damkar</p>
+                <p class="text-slate-300 text-xs flex items-center gap-2">
+                  <i class="far fa-calendar"></i> 12 Juni 2025 · 10.30 WIB
+                </p>
+              </div>
+            </div>
+            <a href="detail.html" class="inline-flex items-center gap-2 bg-white text-[#173A66] hover:bg-[#F1F5F9] px-5 py-2.5 rounded-md font-bold text-sm transition">
+              Baca Selengkapnya <i class="fas fa-arrow-right text-xs"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FILTER + SEARCH ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+      <div class="bg-white border border-[#E3E9F1] rounded-lg p-4 md:p-5">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-2" id="filterTabs">
+            <button class="filter-tab active" data-cat="all"><i class="fas fa-layer-group"></i> Semua <span class="tab-count">12</span></button>
+            <button class="filter-tab" data-cat="kebakaran"><i class="fas fa-fire"></i> Kebakaran <span class="tab-count">3</span></button>
+            <button class="filter-tab" data-cat="penyelamatan"><i class="fas fa-life-ring"></i> Penyelamatan <span class="tab-count">3</span></button>
+            <button class="filter-tab" data-cat="diklat"><i class="fas fa-graduation-cap"></i> Diklat <span class="tab-count">3</span></button>
+            <button class="filter-tab" data-cat="edukasi"><i class="fas fa-school"></i> Edukasi <span class="tab-count">2</span></button>
+            <button class="filter-tab" data-cat="prestasi"><i class="fas fa-trophy"></i> Prestasi <span class="tab-count">2</span></button>
+          </div>
+
+          <div class="search-wrap">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Cari berita...">
+            <button class="search-btn">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ NEWS GRID + SIDEBAR ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+
+        <!-- NEWS GRID -->
+        <div class="lg:col-span-3">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl md:text-2xl font-extrabold text-slate-800">
+              Berita Terbaru
+            </h2>
+            <span class="text-xs font-bold text-slate-400" id="resultCount">12 HASIL</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5" id="newsGrid">
+
+            <!-- NEWS 1 -->
+            <article class="news-card animate-fade-up" data-cat="penyelamatan" data-title="Penyelamatan Kucing di Pohon Tinggi">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-penyelamatan"><i class="fas fa-life-ring"></i> Penyelamatan</span>
+                  <span class="text-xs text-slate-400">10 Jun 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Penyelamatan Kucing di Pohon Setinggi 15 Meter</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Tim rescue evakuasi kucing peliharaan yang terjebak di puncak pohon dengan teknik vertical rescue.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 2 -->
+            <article class="news-card animate-fade-up delay-1" data-cat="diklat" data-title="Pelatihan Damkar untuk Relawan">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1588612466924-ef3b0e6a60b1?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-diklat"><i class="fas fa-graduation-cap"></i> Diklat</span>
+                  <span class="text-xs text-slate-400">8 Jun 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Pelatihan Damkar untuk 200 Relawan Baru</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Pembekalan teknik pemadaman awal, evakuasi korban, dan penggunaan APD bagi relawan dari 20 kelurahan.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 3 -->
+            <article class="news-card animate-fade-up delay-2" data-cat="edukasi" data-title="Edukasi Damkar Cilik di 50 TK">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-edukasi"><i class="fas fa-school"></i> Edukasi</span>
+                  <span class="text-xs text-slate-400">5 Jun 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Edukasi Damkar Cilik Sambangi 50 Taman Kanak-kanak</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Program pengenalan profesi damkar dan simulasi evakuasi ringan untuk anak usia dini.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 4 -->
+            <article class="news-card animate-fade-up" data-cat="prestasi" data-title="Dinas Damkar Raih Penghargaan Nasional">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-prestasi"><i class="fas fa-trophy"></i> Prestasi</span>
+                  <span class="text-xs text-slate-400">3 Jun 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Dinas Damkar Raih Penghargaan Pelayanan Prima 2025</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Penghargaan dari KemenPAN-RB atas inovasi layanan darurat 112 dan digitalisasi command center.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 5 -->
+            <article class="news-card animate-fade-up delay-1" data-cat="kebakaran" data-title="Pemadaman Kebakaran Gudang di Kawasan Industri">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1595787572925-3e0ad0c0e6b4?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-kebakaran"><i class="fas fa-fire"></i> Kebakaran</span>
+                  <span class="text-xs text-slate-400">1 Jun 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Pemadaman Kebakaran Gudang di Kawasan Industri</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Sebanyak 12 unit armada dikerahkan untuk memadamkan kebakaran gudang tekstil. Tidak ada korban jiwa.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 6 -->
+            <article class="news-card animate-fade-up delay-2" data-cat="penyelamatan" data-title="Evakuasi Warga Terjebak Banjir">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-penyelamatan"><i class="fas fa-life-ring"></i> Penyelamatan</span>
+                  <span class="text-xs text-slate-400">28 Mei 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Evakuasi 12 Warga Terjebak Banjir di Sukamaju</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Tim rescue bersama BPBD mengevakuasi 12 warga menggunakan perahu karet saat banjir merendam permukiman.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 7 -->
+            <article class="news-card animate-fade-up" data-cat="diklat" data-title="Sertifikasi NFPA untuk Personel Damkar">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-diklat"><i class="fas fa-graduation-cap"></i> Diklat</span>
+                  <span class="text-xs text-slate-400">25 Mei 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">40 Personel Damkar Raih Sertifikasi NFPA Internasional</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Empat puluh personel lulus uji sertifikasi NFPA 1001 dan 1002, memperkuat kapasitas operasi.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 8 -->
+            <article class="news-card animate-fade-up delay-1" data-cat="edukasi" data-title="Kampung Siaga Api Launching di 20 RW">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-edukasi"><i class="fas fa-school"></i> Edukasi</span>
+                  <span class="text-xs text-slate-400">20 Mei 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Program Kampung Siaga Api Diluncurkan di 20 RW</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Setiap RW kini memiliki tim relawan terlatih dan peralatan pemadaman awal untuk respons cepat.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 9 -->
+            <article class="news-card animate-fade-up delay-2" data-cat="prestasi" data-title="Top 5 Damkar Terbaik Nasional">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-prestasi"><i class="fas fa-trophy"></i> Prestasi</span>
+                  <span class="text-xs text-slate-400">15 Mei 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Masuk Top 5 Damkar Terbaik Nasional Versi Kemendagri</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Penilaian berdasarkan kecepatan respons, inovasi digital, dan kepuasan masyarakat.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 10 -->
+            <article class="news-card animate-fade-up" data-cat="kebakaran" data-title="Sosialisasi Cegah Kebakaran Rumah Tangga">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-kebakaran"><i class="fas fa-fire"></i> Kebakaran</span>
+                  <span class="text-xs text-slate-400">10 Mei 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Sosialisasi Cegah Kebakaran Rumah Tangga di 100 RT</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Program door-to-door untuk mengedukasi warga tentang bahaya korsleting listrik dan tabung gas.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 11 -->
+            <article class="news-card animate-fade-up delay-1" data-cat="penyelamatan" data-title="Rescue Vertical Bangunan Tua">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-penyelamatan"><i class="fas fa-life-ring"></i> Penyelamatan</span>
+                  <span class="text-xs text-slate-400">5 Mei 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Rescue Vertical: Pekerja Terjebak di Atap Bangunan Tua</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Tim rescue berhasil mengevakuasi pekerja proyek yang terjebak di atap dengan teknik rope access.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+            <!-- NEWS 12 -->
+            <article class="news-card animate-fade-up delay-2" data-cat="diklat" data-title="Simulasi Kebakaran di Pabrik">
+              <div class="news-img-wrap h-44">
+                <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+              </div>
+              <div class="p-5 flex flex-col flex-grow">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="cat-tag cat-diklat"><i class="fas fa-graduation-cap"></i> Diklat</span>
+                  <span class="text-xs text-slate-400">2 Mei 2025</span>
+                </div>
+                <h3 class="font-bold text-slate-800 text-base leading-snug mb-2">Simulasi Kebakaran Pabrik Bersama Karyawan dan Tim K3</h3>
+                <p class="text-sm text-slate-500 leading-relaxed flex-grow mb-4">Latihan gabungan damkar dan tim K3 pabrik untuk menguji kesiapan sistem proteksi kebakaran industri.</p>
+                <a href="detail.html" class="text-sm font-bold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-auto">Baca Selengkapnya <i class="fas fa-arrow-right text-[10px]"></i></a>
+              </div>
+            </article>
+
+          </div>
+
+          <!-- No result -->
+          <div id="noResult" class="hidden mt-8">
+            <div class="bg-white border border-[#E3E9F1] rounded-lg p-10 text-center">
+              <i class="fas fa-newspaper text-[#7FA3C7] text-5xl mb-4"></i>
+              <p class="text-slate-700 font-bold">Berita tidak ditemukan</p>
+              <p class="text-sm text-slate-500 mt-1">Coba ubah kata kunci atau pilih kategori lain</p>
+            </div>
+          </div>
+
+          <!-- Load More -->
+          <div class="text-center mt-10">
+            <button class="load-more-btn">
+              <i class="fas fa-plus-circle"></i>
+              Muat Berita Lainnya
+            </button>
+          </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="lg:col-span-1">
+          <div class="lg:sticky lg:top-28 space-y-5">
+
+            <!-- TRENDING -->
+            <div class="sidebar-card animate-fade-up">
+              <div class="flex items-center gap-2 mb-3 pb-3 border-b border-[#E3E9F1]">
+                <div class="w-8 h-8 rounded-md bg-[#173A66] flex items-center justify-center text-white">
+                  <i class="fas fa-fire-flame-curved text-xs"></i>
+                </div>
+                <div>
+                  <p class="text-[10px] font-bold text-[#173A66] uppercase tracking-widest">Trending</p>
+                  <h3 class="text-sm font-extrabold text-slate-800">Paling Dibaca</h3>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <div class="trending-item top-1">
+                  <span class="trending-num">1</span>
+                  <div>
+                    <h4 class="text-sm font-bold text-slate-800 leading-snug hover:text-[#173A66] transition cursor-pointer">Simulasi Evakuasi Gedung Bertingkat</h4>
+                    <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-2"><i class="far fa-eye"></i> 1.2k dibaca</p>
+                  </div>
+                </div>
+
+                <div class="trending-item">
+                  <span class="trending-num">2</span>
+                  <div>
+                    <h4 class="text-sm font-bold text-slate-800 leading-snug hover:text-[#173A66] transition cursor-pointer">Penyelamatan Kucing di Pohon Tinggi</h4>
+                    <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-2"><i class="far fa-eye"></i> 980 dibaca</p>
+                  </div>
+                </div>
+
+                <div class="trending-item">
+                  <span class="trending-num">3</span>
+                  <div>
+                    <h4 class="text-sm font-bold text-slate-800 leading-snug hover:text-[#173A66] transition cursor-pointer">Penghargaan Pelayanan Prima 2025</h4>
+                    <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-2"><i class="far fa-eye"></i> 756 dibaca</p>
+                  </div>
+                </div>
+
+                <div class="trending-item">
+                  <span class="trending-num">4</span>
+                  <div>
+                    <h4 class="text-sm font-bold text-slate-800 leading-snug hover:text-[#173A66] transition cursor-pointer">Pelatihan 200 Relawan Baru</h4>
+                    <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-2"><i class="far fa-eye"></i> 645 dibaca</p>
+                  </div>
+                </div>
+
+                <div class="trending-item">
+                  <span class="trending-num">5</span>
+                  <div>
+                    <h4 class="text-sm font-bold text-slate-800 leading-snug hover:text-[#173A66] transition cursor-pointer">Evakuasi Warga Terjebak Banjir</h4>
+                    <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-2"><i class="far fa-eye"></i> 521 dibaca</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CATEGORIES -->
+            <div class="sidebar-card animate-fade-up delay-1">
+              <div class="flex items-center gap-2 mb-3 pb-3 border-b border-[#E3E9F1]">
+                <div class="w-8 h-8 rounded-md bg-[#173A66] flex items-center justify-center text-white">
+                  <i class="fas fa-tags text-xs"></i>
+                </div>
+                <div>
+                  <p class="text-[10px] font-bold text-[#173A66] uppercase tracking-widest">Kategori</p>
+                  <h3 class="text-sm font-extrabold text-slate-800">Jelajahi Topik</h3>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <a href="#" class="flex items-center justify-between p-2.5 rounded-md hover:bg-slate-50 transition">
+                  <span class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-2 h-2 rounded-full" style="background: #991B1B;"></span> Kebakaran
+                  </span>
+                  <span class="text-xs font-bold text-slate-400">03</span>
+                </a>
+                <a href="#" class="flex items-center justify-between p-2.5 rounded-md hover:bg-slate-50 transition">
+                  <span class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-2 h-2 rounded-full" style="background: #0F5132;"></span> Penyelamatan
+                  </span>
+                  <span class="text-xs font-bold text-slate-400">03</span>
+                </a>
+                <a href="#" class="flex items-center justify-between p-2.5 rounded-md hover:bg-slate-50 transition">
+                  <span class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-2 h-2 rounded-full" style="background: #4C1D95;"></span> Diklat
+                  </span>
+                  <span class="text-xs font-bold text-slate-400">03</span>
+                </a>
+                <a href="#" class="flex items-center justify-between p-2.5 rounded-md hover:bg-slate-50 transition">
+                  <span class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-2 h-2 rounded-full" style="background: #92400E;"></span> Edukasi
+                  </span>
+                  <span class="text-xs font-bold text-slate-400">02</span>
+                </a>
+                <a href="#" class="flex items-center justify-between p-2.5 rounded-md hover:bg-slate-50 transition">
+                  <span class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                    <span class="w-2 h-2 rounded-full" style="background: #856404;"></span> Prestasi
+                  </span>
+                  <span class="text-xs font-bold text-slate-400">02</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- CTA Darurat -->
+            <div class="sidebar-card animate-fade-up delay-2">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                </span>
+                <span class="text-[10px] font-bold text-red-600 uppercase tracking-widest">Darurat</span>
+              </div>
+              <h3 class="font-extrabold text-slate-800 text-base mb-1">Butuh Bantuan Segera?</h3>
+              <p class="text-xs text-slate-500 leading-relaxed mb-3">Hubungi layanan darurat 24 jam kami tanpa pulsa.</p>
+              <a href="tel:112" class="flex items-center justify-center gap-2 bg-[#173A66] hover:bg-[#102A4C] text-white font-bold text-sm py-2.5 rounded-md transition">
+                <i class="fas fa-phone-volume"></i> Hubungi 112
+              </a>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ============ QUOTE ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+      <div class="quote-banner relative overflow-hidden p-10 md:p-14 text-center animate-fade-up">
+        <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5"></div>
+        <div class="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/[0.03]"></div>
+
+        <div class="relative z-10">
+          <i class="fas fa-newspaper text-white/40 text-3xl mb-6"></i>
+          <p class="text-white text-xl md:text-2xl font-semibold leading-snug max-w-4xl mx-auto" style="font-family: 'Playfair Display', serif;">
+            Informasi yang jujur adalah bentuk pelayanan pertama kepada masyarakat.
+          </p>
+          <div class="mt-8 flex items-center justify-center gap-3">
+            <div class="w-10 h-px bg-white/40"></div>
+            <p class="text-white/90 text-sm font-semibold">Publikasi Damkar 2025</p>
+            <div class="w-10 h-px bg-white/40"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer pt-16 pb-8 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-white">
+              <i class="fas fa-fire-extinguisher text-xl"></i>
+            </div>
+            <div>
+              <span class="block text-lg font-bold tracking-tight">Dinas Damkar</span>
+              <span class="block text-[10px] font-semibold text-[#9FB6CE] uppercase tracking-wider">Pemadam &amp; Penyelamat</span>
+            </div>
+          </div>
+          <p class="text-sm text-[#C6D5E5] leading-relaxed">
+            Melayani dengan dedikasi dan kemanusiaan. Siap 24/7 untuk melindungi masyarakat
+            dari bahaya kebakaran dan bencana lainnya.
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Hubungi Kami</h3>
+          <ul class="space-y-3 text-sm text-[#C6D5E5]">
+            <li class="flex items-start gap-3">
+              <i class="fas fa-map-marker-alt text-[#7FA3C7] mt-1"></i>
+              <span>Jl. Merdeka No. 123, Kota Sejahtera,<br>Provinsi Makmur, 12345</span>
+            </li>
+            <li class="flex items-center gap-3"><i class="fas fa-phone-alt text-[#7FA3C7]"></i><span>(021) 123-4567</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-envelope text-[#7FA3C7]"></i><span>info@damkar.go.id</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-clock text-[#7FA3C7]"></i><span>Layanan Darurat: 24 Jam</span></li>
+          </ul>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Ikuti Kami</h3>
+          <p class="text-sm text-[#C6D5E5] mb-4">
+            Dapatkan informasi terbaru seputar kegiatan dan layanan darurat melalui media sosial kami.
+          </p>
+          <div class="flex space-x-3">
+            <a href="#" aria-label="Facebook" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="YouTube" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
+          <ul class="space-y-2 text-sm text-[#C6D5E5]">
+            <li><a href="index.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Beranda</a></li>
+            <li><a href="profile.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Profil Dinas</a></li>
+            <li><a href="program.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Program Kerja</a></li>
+            <li><a href="berita.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Berita &amp; Agenda</a></li>
+            <li><a href="kritik.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Kritik &amp; Saran</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-white/12 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-[#9FB6CE]">
+        <p>&copy; 2026 Dinas Pemadam Kebakaran dan Penyelamatan. Hak Cipta Dilindungi.</p>
+        <div class="flex space-x-6 mt-4 md:mt-0">
+          <a href="#" class="hover:text-white transition">Kebijakan Privasi</a>
+          <a href="#" class="hover:text-white transition">Syarat &amp; Ketentuan</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= SCRIPT ================= -->
+  <script>
+    const navbar = document.getElementById('navbar');
+    const progressBar = document.getElementById('scrollProgress');
+
+    const onScroll = () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Mobile menu
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenuBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      mobileMenuBtn.classList.toggle('open', isOpen);
+      mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        mobileMenuBtn.classList.remove('open');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.querySelectorAll('[data-toggle]').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const target = document.getElementById(trigger.dataset.toggle);
+        if (!target) return;
+        target.classList.toggle('hidden');
+        trigger.classList.toggle('open');
+      });
+    });
+
+    // Filter + Search
+    const tabs = document.querySelectorAll('.filter-tab');
+    const cards = document.querySelectorAll('#newsGrid .news-card');
+    const noResult = document.getElementById('noResult');
+    const resultCount = document.getElementById('resultCount');
+    const searchInput = document.getElementById('searchInput');
+
+    let currentCat = 'all';
+    let currentSearch = '';
+
+    function applyFilters() {
+      let visible = 0;
+      cards.forEach(card => {
+        const cat = card.dataset.cat;
+        const title = (card.dataset.title || '').toLowerCase();
+        const matchCat = (currentCat === 'all' || cat === currentCat);
+        const matchSearch = (currentSearch === '' || title.includes(currentSearch));
+        const show = matchCat && matchSearch;
+        card.style.display = show ? '' : 'none';
+        if (show) {
+          visible++;
+          card.style.animation = 'none';
+          void card.offsetWidth;
+          card.style.animation = '';
+        }
+      });
+
+      noResult.classList.toggle('hidden', visible > 0);
+      resultCount.textContent = visible + ' HASIL';
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentCat = tab.dataset.cat;
+        applyFilters();
+      });
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      currentSearch = e.target.value.toLowerCase().trim();
+      applyFilters();
+    });
+
+    // Load More
+    const loadMoreBtn = document.querySelector('.load-more-btn');
+    loadMoreBtn.addEventListener('click', function() {
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
+      setTimeout(() => {
+        this.innerHTML = '<i class="fas fa-check-circle"></i> Semua berita sudah dimuat';
+        this.style.cursor = 'default';
+        this.disabled = true;
+        this.style.opacity = '0.6';
+      }, 1200);
+    });
+  </script>
+</body>
+</html>

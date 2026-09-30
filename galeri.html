@@ -1,0 +1,1718 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galeri Foto - Dinas Damkar</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       1. DESIGN TOKENS
+       ============================================================ */
+    :root {
+      --navy-900:    #0B1D38;
+      --navy-800:    #102A4C;
+      --navy-700:    #173A66;
+      --navy-600:    #215083;
+      --steel:       #4A7FB0;
+      --steel-light: #7FA3C7;
+
+      --ink:         #152238;
+      --muted:       #64748B;
+      --line:        #E3E9F1;
+      --page:        #F4F6F9;
+      --glass:       rgba(255, 255, 255, 0.92);
+    }
+
+    /* ============================================================
+       2. BASE
+       ============================================================ */
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background-color: var(--page);
+      background-image:
+        radial-gradient(circle at 10% -8%, rgba(23, 58, 102, 0.055), transparent 42%),
+        radial-gradient(circle at 94% 4%, rgba(23, 58, 102, 0.04), transparent 38%),
+        linear-gradient(rgba(16, 42, 76, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 42, 76, 0.03) 1px, transparent 1px);
+      background-size: auto, auto, 56px 56px, 56px 56px;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--page); }
+    ::-webkit-scrollbar-thumb { background: #B9C7D8; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--navy-700); }
+
+    /* ============================================================
+       3. SCROLL PROGRESS
+       ============================================================ */
+    #scrollProgress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0;
+      background: linear-gradient(90deg, var(--navy-600), var(--navy-900));
+      z-index: 9999;
+      transition: width 0.1s linear;
+    }
+
+    /* ============================================================
+       4. NAVBAR
+       ============================================================ */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--glass);
+      backdrop-filter: blur(16px) saturate(170%);
+      -webkit-backdrop-filter: blur(16px) saturate(170%);
+      border-bottom: 1px solid var(--line);
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+    }
+    #navbar.scrolled {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 10px 28px -18px rgba(11, 29, 56, 0.35);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      height: 76px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      color: #fff;
+      background: linear-gradient(140deg, var(--navy-700), var(--navy-900));
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.6);
+      flex-shrink: 0;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #47546B;
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      transition: color 0.25s ease, background 0.25s ease;
+    }
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      left: 14px; right: 14px; bottom: 3px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--navy-700);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .nav-item:hover,
+    .nav-item.active {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.055);
+    }
+    .nav-item:hover::after,
+    .nav-item.active::after { transform: scaleX(1); }
+
+    .nav-item i.fa-chevron-down {
+      font-size: 9px;
+      opacity: 0.55;
+      transition: transform 0.3s ease;
+    }
+    .nav-item:hover i.fa-chevron-down { transform: rotate(180deg); }
+
+    .nav-item-cta {
+      background: var(--navy-800);
+      color: #fff !important;
+      padding: 10px 18px;
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.7);
+    }
+    .nav-item-cta::after { display: none; }
+    .nav-item-cta:hover {
+      background: var(--navy-700);
+      color: #fff !important;
+    }
+
+    .nav-dd-wrap { position: relative; }
+    .nav-dd {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      min-width: 250px;
+      padding: 8px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow:
+        0 24px 48px -22px rgba(11, 29, 56, 0.35),
+        0 4px 12px -6px rgba(11, 29, 56, 0.08);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%) translateY(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+      z-index: 100;
+    }
+    .nav-dd::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: -12px;
+      height: 12px;
+    }
+    .nav-dd-sm { min-width: 215px; }
+    .nav-dd-wrap:hover .nav-dd,
+    .nav-dd-wrap:focus-within .nav-dd {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dd-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #47546B;
+      text-decoration: none;
+      transition: background 0.22s ease, color 0.22s ease;
+    }
+    .dd-item i {
+      width: 16px;
+      font-size: 0.72rem;
+      color: #9AA7B8;
+      text-align: center;
+      transition: color 0.22s ease;
+    }
+    .dd-item:hover {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.06);
+    }
+    .dd-item:hover i { color: var(--navy-700); }
+
+    .hamburger-btn {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--line);
+      transition: background 0.25s ease, border-color 0.25s ease;
+      flex-shrink: 0;
+    }
+    .hamburger-btn:hover {
+      background: rgba(16, 42, 76, 0.05);
+      border-color: #CBD9E8;
+    }
+    .h-line {
+      position: absolute;
+      width: 18px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--navy-800);
+      transition: transform 0.35s ease, opacity 0.25s ease;
+    }
+    .h-line:nth-child(1) { transform: translateY(-6px); }
+    .h-line:nth-child(3) { transform: translateY(6px); }
+    #mobileMenuBtn.open .h-line:nth-child(1) { transform: rotate(45deg); }
+    #mobileMenuBtn.open .h-line:nth-child(2) { transform: translateX(30px); opacity: 0; }
+    #mobileMenuBtn.open .h-line:nth-child(3) { transform: rotate(-45deg); }
+
+    .mobile-menu-wrap {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.45s ease, opacity 0.35s ease;
+    }
+    .mobile-menu-wrap.open { max-height: 900px; opacity: 1; }
+    .mobile-menu-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 14px 0 18px;
+      border-top: 1px solid var(--line);
+    }
+    .m-item, .m-toggle {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #47546B;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.22s ease, color 0.22s ease;
+    }
+    .m-item i, .m-toggle i:not(.chev) {
+      width: 18px;
+      font-size: 0.85rem;
+      color: var(--navy-700);
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .m-item:hover, .m-toggle:hover {
+      background: rgba(16, 42, 76, 0.055);
+      color: var(--navy-800);
+    }
+    .m-item-cta {
+      justify-content: center;
+      margin-top: 6px;
+      color: #fff !important;
+      background: var(--navy-800);
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.6);
+    }
+    .m-item-cta i { color: #fff !important; }
+    .m-item-cta:hover { background: var(--navy-700); color: #fff !important; }
+    .m-toggle .chev {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #9AA7B8;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .m-toggle.open .chev { transform: rotate(180deg); color: var(--navy-700); }
+    .m-sub {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 4px 0 6px 28px;
+    }
+    .m-sub a {
+      padding: 9px 14px;
+      border-radius: 6px;
+      border-left: 2px solid transparent;
+      font-size: 0.83rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+    }
+    .m-sub a:hover {
+      background: rgba(16, 42, 76, 0.05);
+      color: var(--navy-800);
+      border-left-color: var(--navy-700);
+    }
+
+    /* ============================================================
+       5. HAIRLINE
+       ============================================================ */
+    .hairline {
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        var(--line) 12%,
+        var(--line) 88%,
+        transparent 100%);
+    }
+
+    /* ============================================================
+       6. FADE UP
+       ============================================================ */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up { animation: fadeInUp 0.7s ease-out both; }
+    .delay-1 { animation-delay: 0.08s; }
+    .delay-2 { animation-delay: 0.16s; }
+    .delay-3 { animation-delay: 0.24s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ============================================================
+       7. SECTION HEADING
+       ============================================================ */
+    .section-heading {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+    .section-heading::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--navy-800), var(--navy-600));
+    }
+
+    /* ============================================================
+       8. STAT CARD
+       ============================================================ */
+    .stat-card {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.4rem 1.15rem;
+      text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--navy-800);
+      transform: scaleX(0.3);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: #CBD9E8;
+      box-shadow: 0 18px 36px -22px rgba(11, 29, 56, 0.3);
+    }
+    .stat-card:hover::before { transform: scaleX(1); }
+
+    .stat-value {
+      font-weight: 800;
+      font-size: 1.75rem;
+      line-height: 1;
+      color: var(--navy-800);
+    }
+
+    /* ============================================================
+       9. ALBUM CARD
+       ============================================================ */
+    .album-card {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+      cursor: pointer;
+    }
+    .album-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--navy-800), var(--navy-600));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+      z-index: 2;
+    }
+    .album-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 42px -24px rgba(11, 29, 56, 0.32);
+      border-color: #CBD9E8;
+    }
+    .album-card:hover::before { transform: scaleX(1); }
+
+    .album-preview {
+      position: relative;
+      height: 170px;
+      background: var(--page);
+      overflow: hidden;
+    }
+    .album-preview-stack {
+      position: absolute;
+      inset: 0;
+      display: flex;
+    }
+    .album-preview-img {
+      flex: 1;
+      background-size: cover;
+      background-position: center;
+      transition: transform 0.5s ease;
+    }
+    .album-card:hover .album-preview-img {
+      transform: scale(1.05);
+    }
+    .album-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 45%, rgba(11,29,56,0.35) 100%);
+      pointer-events: none;
+    }
+    .album-count-badge {
+      position: absolute;
+      top: 10px; right: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(11, 29, 56, 0.85);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    /* ============================================================
+       10. FILTER TAB
+       ============================================================ */
+    .filter-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #47546B;
+      cursor: pointer;
+      transition: background 0.22s ease, border-color 0.22s ease, color 0.22s ease;
+      white-space: nowrap;
+    }
+    .filter-tab:hover {
+      background: rgba(16, 42, 76, 0.04);
+      border-color: #CBD9E8;
+      color: var(--navy-800);
+    }
+    .filter-tab.active {
+      background: var(--navy-800);
+      color: #fff;
+      border-color: var(--navy-800);
+    }
+    .filter-tab .tab-count {
+      background: rgba(16, 42, 76, 0.08);
+      color: var(--navy-700);
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-weight: 800;
+    }
+    .filter-tab.active .tab-count {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    /* ============================================================
+       11. MASONRY GALLERY
+       ============================================================ */
+    .masonry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      grid-auto-flow: dense;
+    }
+    @media (min-width: 640px) {
+      .masonry-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    }
+    @media (min-width: 1024px) {
+      .masonry-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    }
+
+    .photo-tile {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      background: var(--page);
+      border: 1px solid var(--line);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .photo-tile:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px -22px rgba(11, 29, 56, 0.35);
+      border-color: #CBD9E8;
+      z-index: 10;
+    }
+    .photo-tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+      display: block;
+    }
+    .photo-tile:hover img {
+      transform: scale(1.05);
+    }
+    /* Tile aspect ratios */
+    .photo-tile.h-sm   { aspect-ratio: 4/3; }
+    .photo-tile.h-md   { aspect-ratio: 1/1; }
+    .photo-tile.h-lg   { aspect-ratio: 3/4; }
+    .photo-tile.h-xl   { aspect-ratio: 2/3; }
+    .photo-tile.h-wide { aspect-ratio: 16/9; grid-column: span 2; }
+
+    /* Photo overlay */
+    .photo-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg,
+        rgba(11,29,56,0.05) 0%,
+        rgba(11,29,56,0.45) 55%,
+        rgba(11,29,56,0.92) 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 14px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+    .photo-tile:hover .photo-overlay {
+      opacity: 1;
+    }
+    .photo-overlay-content {
+      transform: translateY(10px);
+      transition: transform 0.3s ease 0.05s;
+    }
+    .photo-tile:hover .photo-overlay-content {
+      transform: translateY(0);
+    }
+
+    /* Featured star badge */
+    .featured-star {
+      position: absolute;
+      top: 10px; left: 10px;
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      background: #92400E;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 0.7rem;
+      z-index: 3;
+    }
+
+    /* Zoom hint */
+    .zoom-hint {
+      position: absolute;
+      top: 10px; right: 10px;
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.4);
+      display: flex; align-items: center; justify-content: center;
+      color: #fff;
+      font-size: 0.75rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 3;
+    }
+    .photo-tile:hover .zoom-hint {
+      opacity: 1;
+    }
+
+    /* Photo category tag */
+    .photo-cat {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.58rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.25);
+      margin-bottom: 6px;
+      width: fit-content;
+    }
+
+    /* ============================================================
+       12. LOAD MORE
+       ============================================================ */
+    .load-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 28px;
+      background: #fff;
+      border: 2px solid var(--navy-700);
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: var(--navy-700);
+      transition: background 0.25s ease, color 0.25s ease;
+      cursor: pointer;
+    }
+    .load-more-btn:hover {
+      background: var(--navy-800);
+      color: #fff;
+      border-color: var(--navy-800);
+    }
+
+    /* ============================================================
+       13. QUOTE
+       ============================================================ */
+    .quote-banner {
+      background: linear-gradient(140deg, var(--navy-800), var(--navy-900));
+      border-radius: 10px;
+      box-shadow: 0 24px 48px -22px rgba(11, 29, 56, 0.5);
+    }
+
+    /* ============================================================
+       14. LIGHTBOX
+       ============================================================ */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 15, 30, 0.96);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .lightbox.active {
+      display: flex;
+      opacity: 1;
+    }
+    .lightbox-inner {
+      position: relative;
+      width: 100%;
+      max-width: 1000px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: lbZoom 0.3s ease;
+    }
+    @keyframes lbZoom {
+      0%   { opacity: 0; transform: scale(0.96); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .lightbox-img-wrap {
+      position: relative;
+      width: 100%;
+      max-height: 70vh;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 40px 80px -20px rgba(0,0,0,0.8);
+      background: var(--navy-900);
+    }
+    .lightbox-img-wrap img {
+      width: 100%;
+      max-height: 70vh;
+      object-fit: contain;
+      display: block;
+    }
+    .lightbox-btn {
+      width: 46px; height: 46px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.22s ease, border-color 0.22s ease;
+      font-size: 1rem;
+      z-index: 10;
+    }
+    .lightbox-btn:hover {
+      background: var(--navy-700);
+      border-color: var(--navy-600);
+    }
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+    }
+    .lightbox-nav.prev { left: 14px; }
+    .lightbox-nav.next { right: 14px; }
+    .lightbox-close {
+      position: absolute;
+      top: 24px; right: 24px;
+      z-index: 20;
+    }
+    .lightbox-info {
+      margin-top: 1.25rem;
+      text-align: center;
+      max-width: 700px;
+    }
+    .lightbox-counter {
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.15em;
+      color: var(--steel-light);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    /* ============================================================
+       15. FOOTER
+       ============================================================ */
+    .site-footer {
+      background: linear-gradient(165deg, #102A4C 0%, #0B1D38 100%);
+      color: #E6EDF5;
+    }
+
+    /* ============================================================
+       16. RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1023px) {
+      .nav-inner { height: 68px; }
+      .logo-badge { width: 40px; height: 40px; font-size: 0.95rem; border-radius: 9px; }
+    }
+  </style>
+</head>
+
+<body class="antialiased">
+
+  <div id="scrollProgress"></div>
+
+  <!-- ================= NAVBAR ================= -->
+  <header id="navbar" class="site-header">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <nav class="nav-inner" aria-label="Navigasi utama">
+
+        <a href="index.html" class="brand-group">
+          <div class="logo-badge">
+            <i class="fas fa-fire-extinguisher"></i>
+          </div>
+          <div class="leading-tight">
+            <span class="block text-sm sm:text-base font-extrabold tracking-tight text-slate-800">Dinas Damkar</span>
+            <span class="block text-[8px] sm:text-[9px] font-semibold text-[#173A66] uppercase tracking-[0.15em] sm:tracking-[0.18em]">Pemadam &amp; Penyelamat</span>
+          </div>
+        </a>
+
+        <div class="hidden lg:flex items-center gap-1">
+          <a href="index.html" class="nav-item">Beranda</a>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item" type="button">
+              Profil PD <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd">
+              <a href="profile.html" class="dd-item"><i class="fas fa-user-tie"></i><span>Profil Pimpinan</span></a>
+              <a href="sejarah.html" class="dd-item"><i class="fas fa-book-open"></i><span>Sejarah</span></a>
+              <a href="struktur.html" class="dd-item"><i class="fas fa-sitemap"></i><span>Struktur Organisasi</span></a>
+              <a href="visimisi.html" class="dd-item"><i class="fas fa-compass"></i><span>Visi dan Misi</span></a>
+              <a href="tugas.html" class="dd-item"><i class="fas fa-list-check"></i><span>Tugas dan Fungsi</span></a>
+            </div>
+          </div>
+
+          <a href="program.html" class="nav-item">Program</a>
+          <a href="agenda.html" class="nav-item">Agenda Pimpinan</a>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item" type="button">
+              Publikasi <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd nav-dd-sm">
+              <a href="berita.html" class="dd-item"><i class="fas fa-newspaper"></i><span>Berita</span></a>
+              <a href="detail.html" class="dd-item"><i class="fas fa-file-lines"></i><span>Detail Berita</span></a>
+            </div>
+          </div>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item active" type="button">
+              Dokumentasi <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd nav-dd-sm">
+              <a href="galeri.html" class="dd-item"><i class="fas fa-images"></i><span>Galeri Foto</span></a>
+              <a href="video.html" class="dd-item"><i class="fas fa-video"></i><span>Video Kegiatan</span></a>
+            </div>
+          </div>
+
+          <a href="kritik.html" class="nav-item nav-item-cta">Kritik &amp; Saran</a>
+        </div>
+
+        <button id="mobileMenuBtn" class="lg:hidden hamburger-btn" aria-label="Buka menu" aria-expanded="false">
+          <span class="h-line"></span>
+          <span class="h-line"></span>
+          <span class="h-line"></span>
+        </button>
+      </nav>
+    </div>
+
+    <div id="mobileMenu" class="mobile-menu-wrap lg:hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mobile-menu-inner">
+          <a href="index.html" class="m-item"><i class="fas fa-home"></i> Beranda</a>
+
+          <div class="m-toggle" data-toggle="m-profil">
+            <i class="fas fa-building"></i> <span>Profil PD</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-profil" class="hidden m-sub">
+            <a href="profile.html">Profil Pimpinan</a>
+            <a href="sejarah.html">Sejarah</a>
+            <a href="struktur.html">Struktur Organisasi</a>
+            <a href="visimisi.html">Visi &amp; Misi</a>
+            <a href="tugas.html">Tugas &amp; Fungsi</a>
+          </div>
+
+          <a href="program.html" class="m-item"><i class="fas fa-clipboard-list"></i> Program</a>
+          <a href="agenda.html" class="m-item"><i class="fas fa-calendar-alt"></i> Agenda Pimpinan</a>
+
+          <div class="m-toggle" data-toggle="m-publikasi">
+            <i class="fas fa-bullhorn"></i> <span>Publikasi</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-publikasi" class="hidden m-sub">
+            <a href="berita.html">Berita</a>
+            <a href="detail.html">Detail Berita</a>
+          </div>
+
+          <div class="m-toggle" data-toggle="m-dok">
+            <i class="fas fa-camera"></i> <span>Dokumentasi</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-dok" class="hidden m-sub">
+            <a href="galeri.html">Galeri Foto</a>
+            <a href="video.html">Video Kegiatan</a>
+          </div>
+
+          <a href="kritik.html" class="m-item m-item-cta"><i class="fas fa-comment-dots"></i> Kritik &amp; Saran</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN ================= -->
+  <main class="w-full relative">
+
+    <!-- PAGE HEADER -->
+    <section class="pt-12 pb-6 animate-fade-up">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 mb-5">
+          <a href="index.html" class="hover:text-[#173A66] transition flex items-center gap-1.5"><i class="fas fa-home"></i> Beranda</a>
+          <i class="fas fa-chevron-right text-[9px] text-slate-400"></i>
+          <span class="text-slate-500">Dokumentasi</span>
+          <i class="fas fa-chevron-right text-[9px] text-slate-400"></i>
+          <span class="text-[#173A66]">Galeri Foto</span>
+        </nav>
+
+        <h1 class="text-3xl md:text-4xl font-extrabold text-slate-800">
+          Galeri <span class="text-[#173A66]">Foto</span>
+        </h1>
+        <p class="text-slate-500 mt-3 max-w-2xl text-sm md:text-base">
+          Arsip visual perjalanan Dinas Pemadam Kebakaran dan Penyelamatan — momen nyata di balik setiap operasi, pelatihan, dan pengabdian.
+        </p>
+      </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
+      <div class="hairline"></div>
+    </div>
+
+    <!-- ============ STATISTIK ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+        <div class="stat-card animate-fade-up">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Foto</p>
+          <p class="stat-value" data-count="248" data-suffix="+">0</p>
+        </div>
+
+        <div class="stat-card animate-fade-up delay-1">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Album Aktif</p>
+          <p class="stat-value" data-count="12">0</p>
+        </div>
+
+        <div class="stat-card animate-fade-up delay-2">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kontributor</p>
+          <p class="stat-value" data-count="8">0</p>
+        </div>
+
+        <div class="stat-card animate-fade-up delay-3">
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Views</p>
+          <p class="stat-value" data-count="15" data-suffix="k">0</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ ALBUM ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <div class="flex items-end justify-between mb-8 flex-wrap gap-4">
+        <div>
+          <p class="text-xs font-bold text-[#173A66] uppercase tracking-wider mb-2">Koleksi Pilihan</p>
+          <h2 class="text-2xl md:text-3xl font-bold text-slate-800 section-heading">Album Kegiatan</h2>
+        </div>
+        <a href="#" class="text-[#173A66] font-bold text-sm hover:text-[#0B1D38] transition flex items-center gap-1.5">
+          Semua Album <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+        <!-- Album 1 -->
+        <div class="album-card animate-fade-up">
+          <div class="album-preview">
+            <div class="album-preview-stack">
+              <div class="album-preview-img" style="background-image: url('https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=600&auto=format&fit=crop');"></div>
+              <div class="album-preview-img" style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85eb94?q=80&w=600&auto=format&fit=crop');"></div>
+            </div>
+            <div class="album-overlay"></div>
+            <span class="album-count-badge"><i class="fas fa-image text-[10px]"></i> 42 Foto</span>
+          </div>
+          <div class="p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2 h-2 rounded-full" style="background: #991B1B;"></span>
+              <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Operasi</p>
+            </div>
+            <h3 class="font-extrabold text-slate-800 text-base mb-1">Operasi Pemadaman 2025</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Dokumentasi operasi pemadaman kebakaran sepanjang tahun 2025.</p>
+          </div>
+        </div>
+
+        <!-- Album 2 -->
+        <div class="album-card animate-fade-up delay-1">
+          <div class="album-preview">
+            <div class="album-preview-stack">
+              <div class="album-preview-img" style="background-image: url('https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=600&auto=format&fit=crop');"></div>
+              <div class="album-preview-img" style="background-image: url('https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=600&auto=format&fit=crop');"></div>
+            </div>
+            <div class="album-overlay"></div>
+            <span class="album-count-badge"><i class="fas fa-image text-[10px]"></i> 34 Foto</span>
+          </div>
+          <div class="p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2 h-2 rounded-full" style="background: #0F5132;"></span>
+              <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Rescue</p>
+            </div>
+            <h3 class="font-extrabold text-slate-800 text-base mb-1">Misi Penyelamatan</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Momen dramatis penyelamatan jiwa dari ketinggian, banjir, dan reruntuhan.</p>
+          </div>
+        </div>
+
+        <!-- Album 3 -->
+        <div class="album-card animate-fade-up delay-2">
+          <div class="album-preview">
+            <div class="album-preview-stack">
+              <div class="album-preview-img" style="background-image: url('https://images.unsplash.com/photo-1588612466924-ef3b0e6a60b1?q=80&w=600&auto=format&fit=crop');"></div>
+              <div class="album-preview-img" style="background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&auto=format&fit=crop');"></div>
+            </div>
+            <div class="album-overlay"></div>
+            <span class="album-count-badge"><i class="fas fa-image text-[10px]"></i> 58 Foto</span>
+          </div>
+          <div class="p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2 h-2 rounded-full" style="background: #4C1D95;"></span>
+              <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Diklat</p>
+            </div>
+            <h3 class="font-extrabold text-slate-800 text-base mb-1">Pelatihan &amp; Sertifikasi</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Latihan fisik, teknis, dan mental personel untuk kesiapan operasi.</p>
+          </div>
+        </div>
+
+        <!-- Album 4 -->
+        <div class="album-card animate-fade-up delay-3">
+          <div class="album-preview">
+            <div class="album-preview-stack">
+              <div class="album-preview-img" style="background-image: url('https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=600&auto=format&fit=crop');"></div>
+              <div class="album-preview-img" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=600&auto=format&fit=crop');"></div>
+            </div>
+            <div class="album-overlay"></div>
+            <span class="album-count-badge"><i class="fas fa-image text-[10px]"></i> 46 Foto</span>
+          </div>
+          <div class="p-5">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-2 h-2 rounded-full" style="background: #92400E;"></span>
+              <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Edukasi</p>
+            </div>
+            <h3 class="font-extrabold text-slate-800 text-base mb-1">Edukasi Masyarakat</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">Kegiatan sosialisasi kebakaran ke sekolah, kantor, dan kampung.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ============ GALLERY ============ -->
+    <section id="gallery" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <div class="flex items-end justify-between mb-8 flex-wrap gap-4">
+        <div>
+          <p class="text-xs font-bold text-[#173A66] uppercase tracking-wider mb-2">Arsip Visual</p>
+          <h2 class="text-2xl md:text-3xl font-bold text-slate-800 section-heading">Semua Foto</h2>
+        </div>
+        <span class="text-xs font-bold text-slate-400" id="photoCount">24 FOTO</span>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="bg-white border border-[#E3E9F1] rounded-lg p-4 mb-8 animate-fade-up">
+        <div class="flex flex-wrap items-center gap-2" id="filterTabs">
+          <button class="filter-tab active" data-cat="all"><i class="fas fa-layer-group"></i> Semua <span class="tab-count">24</span></button>
+          <button class="filter-tab" data-cat="operasi"><i class="fas fa-fire"></i> Operasi <span class="tab-count">8</span></button>
+          <button class="filter-tab" data-cat="rescue"><i class="fas fa-life-ring"></i> Rescue <span class="tab-count">5</span></button>
+          <button class="filter-tab" data-cat="diklat"><i class="fas fa-graduation-cap"></i> Diklat <span class="tab-count">4</span></button>
+          <button class="filter-tab" data-cat="edukasi"><i class="fas fa-school"></i> Edukasi <span class="tab-count">4</span></button>
+          <button class="filter-tab" data-cat="armada"><i class="fas fa-truck-fast"></i> Armada <span class="tab-count">3</span></button>
+        </div>
+      </div>
+
+      <!-- Masonry Gallery -->
+      <div class="masonry-grid" id="galleryGrid">
+
+        <!-- PHOTO 1 — Featured, wide -->
+        <div class="photo-tile h-wide animate-fade-up" data-cat="operasi" data-src="https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=2000&auto=format&fit=crop" data-title="Operasi Pemadaman Gudang Tekstil" data-date="1 Juni 2025" data-cat-label="Operasi">
+          <img src="https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=1000&auto=format&fit=crop" alt="Operasi Pemadaman">
+          <div class="featured-star"><i class="fas fa-star"></i></div>
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-fire"></i> Operasi</span>
+              <h3 class="text-white font-bold text-base leading-tight">Operasi Pemadaman Gudang Tekstil</h3>
+              <p class="text-slate-200 text-xs mt-1.5 flex items-center gap-1.5"><i class="far fa-calendar"></i> 1 Juni 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 2 -->
+        <div class="photo-tile h-md animate-fade-up delay-1" data-cat="operasi" data-src="https://images.unsplash.com/photo-1595787572925-3e0ad0c0e6b4?q=80&w=2000&auto=format&fit=crop" data-title="Pemadaman Api di Lahan Kosong" data-date="28 Mei 2025" data-cat-label="Operasi">
+          <img src="https://images.unsplash.com/photo-1595787572925-3e0ad0c0e6b4?q=80&w=1000&auto=format&fit=crop" alt="Pemadaman">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-fire"></i> Operasi</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Pemadaman Api di Lahan Kosong</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 28 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 3 -->
+        <div class="photo-tile h-sm animate-fade-up delay-2" data-cat="rescue" data-src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2000&auto=format&fit=crop" data-title="Penyelamatan Kucing di Pohon" data-date="10 Juni 2025" data-cat-label="Rescue">
+          <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1000&auto=format&fit=crop" alt="Penyelamatan">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-life-ring"></i> Rescue</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Penyelamatan Kucing di Pohon</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 10 Juni 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 4 -->
+        <div class="photo-tile h-lg animate-fade-up delay-3" data-cat="diklat" data-src="https://images.unsplash.com/photo-1588612466924-ef3b0e6a60b1?q=80&w=2000&auto=format&fit=crop" data-title="Pelatihan Vertical Rescue" data-date="8 Juni 2025" data-cat-label="Diklat">
+          <img src="https://images.unsplash.com/photo-1588612466924-ef3b0e6a60b1?q=80&w=1000&auto=format&fit=crop" alt="Diklat">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-graduation-cap"></i> Diklat</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Pelatihan Vertical Rescue</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 8 Juni 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 5 -->
+        <div class="photo-tile h-sm animate-fade-up delay-3" data-cat="operasi" data-src="https://images.unsplash.com/photo-1558618666-fcd25c85eb94?q=80&w=2000&auto=format&fit=crop" data-title="Pengecekan Hydrant" data-date="9 Juni 2025" data-cat-label="Operasi">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85eb94?q=80&w=1000&auto=format&fit=crop" alt="Hydrant">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-fire"></i> Operasi</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Pengecekan Hydrant</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 9 Juni 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 6 -->
+        <div class="photo-tile h-xl animate-fade-up delay-3" data-cat="armada" data-src="https://images.unsplash.com/photo-1605833556294-ea5c7c53179c?q=80&w=2000&auto=format&fit=crop" data-title="Armada Baru Generasi 2025" data-date="1 Juni 2025" data-cat-label="Armada">
+          <img src="https://images.unsplash.com/photo-1605833556294-ea5c7c53179c?q=80&w=1000&auto=format&fit=crop" alt="Armada">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-truck-fast"></i> Armada</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Armada Baru Generasi 2025</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 1 Juni 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 7 -->
+        <div class="photo-tile h-md animate-fade-up delay-3" data-cat="rescue" data-src="https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=2000&auto=format&fit=crop" data-title="Evakuasi Banjir Sukamaju" data-date="28 Mei 2025" data-cat-label="Rescue">
+          <img src="https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=1000&auto=format&fit=crop" alt="Evakuasi">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-life-ring"></i> Rescue</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Evakuasi Banjir Sukamaju</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 28 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 8 -->
+        <div class="photo-tile h-sm animate-fade-up delay-3" data-cat="edukasi" data-src="https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=2000&auto=format&fit=crop" data-title="Edukasi Damkar Cilik" data-date="5 Juni 2025" data-cat-label="Edukasi">
+          <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=1000&auto=format&fit=crop" alt="Edukasi">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-school"></i> Edukasi</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Edukasi Damkar Cilik</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 5 Juni 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 9 -->
+        <div class="photo-tile h-md animate-fade-up delay-3" data-cat="diklat" data-src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2000&auto=format&fit=crop" data-title="Latihan Fisik Rutin" data-date="25 Mei 2025" data-cat-label="Diklat">
+          <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000&auto=format&fit=crop" alt="Latihan">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-graduation-cap"></i> Diklat</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Latihan Fisik Rutin</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 25 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 10 -->
+        <div class="photo-tile h-sm animate-fade-up delay-3" data-cat="edukasi" data-src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000&auto=format&fit=crop" data-title="Sosialisasi di Perkantoran" data-date="20 Mei 2025" data-cat-label="Edukasi">
+          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop" alt="Sosialisasi">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-school"></i> Edukasi</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Sosialisasi di Perkantoran</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 20 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 11 -->
+        <div class="photo-tile h-lg animate-fade-up delay-3" data-cat="armada" data-src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=2000&auto=format&fit=crop" data-title="Inspeksi Armada Bulanan" data-date="15 Mei 2025" data-cat-label="Armada">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1000&auto=format&fit=crop" alt="Inspeksi">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-truck-fast"></i> Armada</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Inspeksi Armada Bulanan</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 15 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 12 -->
+        <div class="photo-tile h-md animate-fade-up delay-3" data-cat="rescue" data-src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=2000&auto=format&fit=crop" data-title="Rescue Vertical Bangunan" data-date="10 Mei 2025" data-cat-label="Rescue">
+          <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1000&auto=format&fit=crop" alt="Rescue">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-life-ring"></i> Rescue</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Rescue Vertical Bangunan</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 10 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 13 — wide -->
+        <div class="photo-tile h-wide animate-fade-up delay-3" data-cat="operasi" data-src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2000&auto=format&fit=crop" data-title="Simulasi Kebakaran Berskala Besar" data-date="12 Juni 2025" data-cat-label="Operasi">
+          <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1400&auto=format&fit=crop" alt="Simulasi">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-fire"></i> Operasi</span>
+              <h3 class="text-white font-bold text-base leading-tight">Simulasi Kebakaran Berskala Besar</h3>
+              <p class="text-slate-200 text-xs mt-1.5 flex items-center gap-1.5"><i class="far fa-calendar"></i> 12 Juni 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 14 -->
+        <div class="photo-tile h-sm animate-fade-up delay-3" data-cat="diklat" data-src="https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?q=80&w=2000&auto=format&fit=crop" data-title="Sertifikasi NFPA" data-date="25 Mei 2025" data-cat-label="Diklat">
+          <img src="https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?q=80&w=1000&auto=format&fit=crop" alt="Sertifikasi">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-graduation-cap"></i> Diklat</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Sertifikasi NFPA</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 25 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 15 -->
+        <div class="photo-tile h-xl animate-fade-up delay-3" data-cat="armada" data-src="https://images.unsplash.com/photo-1571980555751-b1a8a6c5c0d7?q=80&w=2000&auto=format&fit=crop" data-title="Mobil Komando Baru" data-date="8 Mei 2025" data-cat-label="Armada">
+          <img src="https://images.unsplash.com/photo-1571980555751-b1a8a6c5c0d7?q=80&w=1000&auto=format&fit=crop" alt="Mobil Komando">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-truck-fast"></i> Armada</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Mobil Komando Baru</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 8 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 16 -->
+        <div class="photo-tile h-md animate-fade-up delay-3" data-cat="edukasi" data-src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=2000&auto=format&fit=crop" data-title="Demo Pemadaman untuk Warga" data-date="5 Mei 2025" data-cat-label="Edukasi">
+          <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=1000&auto=format&fit=crop" alt="Demo">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-school"></i> Edukasi</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Demo Pemadaman untuk Warga</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 5 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 17 -->
+        <div class="photo-tile h-lg animate-fade-up delay-3" data-cat="rescue" data-src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=2000&auto=format&fit=crop" data-title="Evakuasi Korban Kecelakaan" data-date="2 Mei 2025" data-cat-label="Rescue">
+          <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=1000&auto=format&fit=crop" alt="Evakuasi">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-life-ring"></i> Rescue</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Evakuasi Korban Kecelakaan</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 2 Mei 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 18 -->
+        <div class="photo-tile h-sm animate-fade-up delay-3" data-cat="operasi" data-src="https://images.unsplash.com/photo-1595787572925-3e0ad0c0e6b4?q=80&w=2000&auto=format&fit=crop" data-title="Operasi Malam" data-date="28 April 2025" data-cat-label="Operasi">
+          <img src="https://images.unsplash.com/photo-1595787572925-3e0ad0c0e6b4?q=80&w=1000&auto=format&fit=crop" alt="Operasi Malam">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-fire"></i> Operasi</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Operasi Malam</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 28 April 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 19 -->
+        <div class="photo-tile h-md animate-fade-up delay-3" data-cat="diklat" data-src="https://images.unsplash.com/photo-1588612466924-ef3b0e6a60b1?q=80&w=2000&auto=format&fit=crop" data-title="Latihan Penggunaan APD" data-date="20 April 2025" data-cat-label="Diklat">
+          <img src="https://images.unsplash.com/photo-1588612466924-ef3b0e6a60b1?q=80&w=1000&auto=format&fit=crop" alt="APD">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-graduation-cap"></i> Diklat</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Latihan Penggunaan APD</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 20 April 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 20 -->
+        <div class="photo-tile h-sm animate-fade-up delay-3" data-cat="edukasi" data-src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2000&auto=format&fit=crop" data-title="Kampung Siaga Api" data-date="15 April 2025" data-cat-label="Edukasi">
+          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1000&auto=format&fit=crop" alt="Kampung">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-school"></i> Edukasi</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Kampung Siaga Api</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 15 April 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 21 -->
+        <div class="photo-tile h-md animate-fade-up delay-3" data-cat="operasi" data-src="https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=2000&auto=format&fit=crop" data-title="Pemadaman Rumah Warga" data-date="10 April 2025" data-cat-label="Operasi">
+          <img src="https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=1000&auto=format&fit=crop" alt="Rumah">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-fire"></i> Operasi</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Pemadaman Rumah Warga</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 10 April 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 22 -->
+        <div class="photo-tile h-sm animate-fade-up delay-3" data-cat="rescue" data-src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2000&auto=format&fit=crop" data-title="Rescue Anjing Terjebak" data-date="5 April 2025" data-cat-label="Rescue">
+          <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1000&auto=format&fit=crop" alt="Rescue Anjing">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-life-ring"></i> Rescue</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Rescue Anjing Terjebak</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 5 April 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 23 -->
+        <div class="photo-tile h-md animate-fade-up delay-3" data-cat="armada" data-src="https://images.unsplash.com/photo-1605833556294-ea5c7c53179c?q=80&w=2000&auto=format&fit=crop" data-title="Cuci Armada Rutin" data-date="1 April 2025" data-cat-label="Armada">
+          <img src="https://images.unsplash.com/photo-1605833556294-ea5c7c53179c?q=80&w=1000&auto=format&fit=crop" alt="Cuci Armada">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-truck-fast"></i> Armada</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Cuci Armada Rutin</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 1 April 2025</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PHOTO 24 -->
+        <div class="photo-tile h-lg animate-fade-up delay-3" data-cat="operasi" data-src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2000&auto=format&fit=crop" data-title="Briefing Pagi Tim" data-date="25 Maret 2025" data-cat-label="Operasi">
+          <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1000&auto=format&fit=crop" alt="Briefing">
+          <div class="zoom-hint"><i class="fas fa-expand"></i></div>
+          <div class="photo-overlay">
+            <div class="photo-overlay-content">
+              <span class="photo-cat"><i class="fas fa-fire"></i> Operasi</span>
+              <h3 class="text-white font-bold text-sm leading-tight">Briefing Pagi Tim</h3>
+              <p class="text-slate-200 text-[10px] mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 25 Maret 2025</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- No result -->
+      <div id="noResult" class="hidden text-center py-16">
+        <div class="bg-white border border-[#E3E9F1] rounded-lg p-10 inline-block">
+          <i class="fas fa-image text-[#7FA3C7] text-5xl mb-4"></i>
+          <p class="text-slate-700 font-bold">Foto tidak ditemukan</p>
+          <p class="text-sm text-slate-500 mt-1">Coba pilih kategori lain</p>
+        </div>
+      </div>
+
+      <!-- Load More -->
+      <div class="text-center mt-12">
+        <button class="load-more-btn">
+          <i class="fas fa-plus-circle"></i>
+          Muat Foto Lainnya
+        </button>
+      </div>
+    </section>
+
+    <!-- ============ QUOTE ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+      <div class="quote-banner relative overflow-hidden p-10 md:p-14 text-center animate-fade-up">
+        <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5"></div>
+        <div class="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/[0.03]"></div>
+
+        <div class="relative z-10">
+          <i class="fas fa-camera text-white/40 text-3xl mb-6"></i>
+          <p class="text-white text-xl md:text-2xl font-semibold leading-snug max-w-4xl mx-auto" style="font-family: 'Playfair Display', serif;">
+            Foto tidak pernah berbohong — ia menceritakan keberanian yang tak sempat diucapkan kata.
+          </p>
+          <div class="mt-8 flex items-center justify-center gap-3">
+            <div class="w-10 h-px bg-white/40"></div>
+            <p class="text-white/90 text-sm font-semibold">Visual Archive · 2025</p>
+            <div class="w-10 h-px bg-white/40"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ LIGHTBOX ============ -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-btn lightbox-close" id="lightboxClose" aria-label="Tutup">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <div class="lightbox-inner">
+      <div class="lightbox-img-wrap">
+        <img id="lightboxImg" src="" alt="Foto">
+        <button class="lightbox-btn lightbox-nav prev" id="lightboxPrev" aria-label="Sebelumnya">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="lightbox-btn lightbox-nav next" id="lightboxNext" aria-label="Berikutnya">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <div class="lightbox-info">
+        <p class="lightbox-counter" id="lightboxCounter">01 / 24</p>
+        <h3 class="text-white font-bold text-lg md:text-xl leading-tight" id="lightboxTitle">Judul Foto</h3>
+        <p class="text-slate-300 text-sm mt-2 flex items-center justify-center gap-3 flex-wrap">
+          <span><i class="far fa-calendar mr-1"></i> <span id="lightboxDate">Tanggal</span></span>
+          <span class="text-slate-500">·</span>
+          <span><i class="fas fa-tag mr-1"></i> <span id="lightboxCat">Kategori</span></span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer pt-16 pb-8 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-white">
+              <i class="fas fa-fire-extinguisher text-xl"></i>
+            </div>
+            <div>
+              <span class="block text-lg font-bold tracking-tight">Dinas Damkar</span>
+              <span class="block text-[10px] font-semibold text-[#9FB6CE] uppercase tracking-wider">Pemadam &amp; Penyelamat</span>
+            </div>
+          </div>
+          <p class="text-sm text-[#C6D5E5] leading-relaxed">
+            Melayani dengan dedikasi dan kemanusiaan. Siap 24/7 untuk melindungi masyarakat
+            dari bahaya kebakaran dan bencana lainnya.
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Hubungi Kami</h3>
+          <ul class="space-y-3 text-sm text-[#C6D5E5]">
+            <li class="flex items-start gap-3">
+              <i class="fas fa-map-marker-alt text-[#7FA3C7] mt-1"></i>
+              <span>Jl. Merdeka No. 123, Kota Sejahtera,<br>Provinsi Makmur, 12345</span>
+            </li>
+            <li class="flex items-center gap-3"><i class="fas fa-phone-alt text-[#7FA3C7]"></i><span>(021) 123-4567</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-envelope text-[#7FA3C7]"></i><span>info@damkar.go.id</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-clock text-[#7FA3C7]"></i><span>Layanan Darurat: 24 Jam</span></li>
+          </ul>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Ikuti Kami</h3>
+          <p class="text-sm text-[#C6D5E5] mb-4">
+            Dapatkan informasi terbaru seputar kegiatan dan layanan darurat melalui media sosial kami.
+          </p>
+          <div class="flex space-x-3">
+            <a href="#" aria-label="Facebook" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="YouTube" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
+          <ul class="space-y-2 text-sm text-[#C6D5E5]">
+            <li><a href="index.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Beranda</a></li>
+            <li><a href="profile.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Profil Dinas</a></li>
+            <li><a href="program.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Program Kerja</a></li>
+            <li><a href="berita.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Berita &amp; Agenda</a></li>
+            <li><a href="kritik.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Kritik &amp; Saran</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-white/12 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-[#9FB6CE]">
+        <p>&copy; 2026 Dinas Pemadam Kebakaran dan Penyelamatan. Hak Cipta Dilindungi.</p>
+        <div class="flex space-x-6 mt-4 md:mt-0">
+          <a href="#" class="hover:text-white transition">Kebijakan Privasi</a>
+          <a href="#" class="hover:text-white transition">Syarat &amp; Ketentuan</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= SCRIPT ================= -->
+  <script>
+    const navbar = document.getElementById('navbar');
+    const progressBar = document.getElementById('scrollProgress');
+
+    const onScroll = () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Mobile menu
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenuBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      mobileMenuBtn.classList.toggle('open', isOpen);
+      mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        mobileMenuBtn.classList.remove('open');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.querySelectorAll('[data-toggle]').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const target = document.getElementById(trigger.dataset.toggle);
+        if (!target) return;
+        target.classList.toggle('hidden');
+        trigger.classList.toggle('open');
+      });
+    });
+
+    // Filter
+    const tabs = document.querySelectorAll('.filter-tab');
+    const tiles = document.querySelectorAll('#galleryGrid .photo-tile');
+    const noResult = document.getElementById('noResult');
+    const photoCount = document.getElementById('photoCount');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const cat = tab.dataset.cat;
+        let visible = 0;
+        tiles.forEach(tile => {
+          const show = (cat === 'all' || tile.dataset.cat === cat);
+          tile.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        noResult.classList.toggle('hidden', visible > 0);
+        photoCount.textContent = visible + ' FOTO';
+      });
+    });
+
+    // Stats counter
+    const counters = document.querySelectorAll('[data-count]');
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.getAttribute('data-count'));
+          const suffix = el.getAttribute('data-suffix') || '';
+          let current = 0;
+          const step = Math.max(1, Math.ceil(target / 50));
+          const timer = setInterval(() => {
+            current += step;
+            if (current >= target) {
+              el.textContent = target + suffix;
+              clearInterval(timer);
+            } else {
+              el.textContent = current + suffix;
+            }
+          }, 25);
+          counterObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.4 });
+    counters.forEach(c => counterObserver.observe(c));
+
+    // Load more
+    document.querySelector('.load-more-btn').addEventListener('click', function() {
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
+      setTimeout(() => {
+        this.innerHTML = '<i class="fas fa-check-circle"></i> Semua foto sudah dimuat';
+        this.style.cursor = 'default';
+        this.disabled = true;
+        this.style.opacity = '0.6';
+      }, 1200);
+    });
+
+    // Lightbox
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxTitle = document.getElementById('lightboxTitle');
+    const lightboxDate = document.getElementById('lightboxDate');
+    const lightboxCat = document.getElementById('lightboxCat');
+    const lightboxCounter = document.getElementById('lightboxCounter');
+    const btnPrev = document.getElementById('lightboxPrev');
+    const btnNext = document.getElementById('lightboxNext');
+    const btnClose = document.getElementById('lightboxClose');
+
+    let currentPhotos = [];
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+      currentPhotos = Array.from(tiles).filter(t => t.style.display !== 'none');
+      currentIndex = index;
+      renderLightbox();
+      lightbox.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function renderLightbox() {
+      const tile = currentPhotos[currentIndex];
+      if (!tile) return;
+      lightboxImg.src = tile.dataset.src;
+      lightboxTitle.textContent = tile.dataset.title;
+      lightboxDate.textContent = tile.dataset.date;
+      lightboxCat.textContent = tile.dataset.catLabel;
+      lightboxCounter.textContent = String(currentIndex + 1).padStart(2, '0') + ' / ' + String(currentPhotos.length).padStart(2, '0');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function nextPhoto() {
+      currentIndex = (currentIndex + 1) % currentPhotos.length;
+      renderLightbox();
+    }
+
+    function prevPhoto() {
+      currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length;
+      renderLightbox();
+    }
+
+    tiles.forEach(tile => {
+      tile.addEventListener('click', () => {
+        const visible = Array.from(tiles).filter(t => t.style.display !== 'none');
+        const idx = visible.indexOf(tile);
+        if (idx >= 0) openLightbox(idx);
+      });
+    });
+
+    btnNext.addEventListener('click', (e) => { e.stopPropagation(); nextPhoto(); });
+    btnPrev.addEventListener('click', (e) => { e.stopPropagation(); prevPhoto(); });
+    btnClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'Escape') closeLightbox();
+      if (e.key === 'ArrowRight') nextPhoto();
+      if (e.key === 'ArrowLeft') prevPhoto();
+    });
+  </script>
+</body>
+</html>

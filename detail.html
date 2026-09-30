@@ -1,0 +1,1605 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulasi Evakuasi Gedung Bertingkat - Dinas Damkar</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       1. DESIGN TOKENS
+       ============================================================ */
+    :root {
+      --navy-900:    #0B1D38;
+      --navy-800:    #102A4C;
+      --navy-700:    #173A66;
+      --navy-600:    #215083;
+      --steel:       #4A7FB0;
+      --steel-light: #7FA3C7;
+
+      --ink:         #152238;
+      --muted:       #64748B;
+      --line:        #E3E9F1;
+      --page:        #F4F6F9;
+      --glass:       rgba(255, 255, 255, 0.92);
+    }
+
+    /* ============================================================
+       2. BASE
+       ============================================================ */
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background-color: var(--page);
+      background-image:
+        radial-gradient(circle at 10% -8%, rgba(23, 58, 102, 0.055), transparent 42%),
+        radial-gradient(circle at 94% 4%, rgba(23, 58, 102, 0.04), transparent 38%),
+        linear-gradient(rgba(16, 42, 76, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 42, 76, 0.03) 1px, transparent 1px);
+      background-size: auto, auto, 56px 56px, 56px 56px;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--page); }
+    ::-webkit-scrollbar-thumb { background: #B9C7D8; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--navy-700); }
+
+    /* ============================================================
+       3. SCROLL PROGRESS
+       ============================================================ */
+    #scrollProgress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0;
+      background: linear-gradient(90deg, var(--navy-600), var(--navy-900));
+      z-index: 9999;
+      transition: width 0.1s linear;
+    }
+
+    /* ============================================================
+       4. NAVBAR
+       ============================================================ */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--glass);
+      backdrop-filter: blur(16px) saturate(170%);
+      -webkit-backdrop-filter: blur(16px) saturate(170%);
+      border-bottom: 1px solid var(--line);
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+    }
+    #navbar.scrolled {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 10px 28px -18px rgba(11, 29, 56, 0.35);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      height: 76px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      color: #fff;
+      background: linear-gradient(140deg, var(--navy-700), var(--navy-900));
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.6);
+      flex-shrink: 0;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #47546B;
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      transition: color 0.25s ease, background 0.25s ease;
+    }
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      left: 14px; right: 14px; bottom: 3px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--navy-700);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .nav-item:hover,
+    .nav-item.active {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.055);
+    }
+    .nav-item:hover::after,
+    .nav-item.active::after { transform: scaleX(1); }
+
+    .nav-item i.fa-chevron-down {
+      font-size: 9px;
+      opacity: 0.55;
+      transition: transform 0.3s ease;
+    }
+    .nav-item:hover i.fa-chevron-down { transform: rotate(180deg); }
+
+    .nav-item-cta {
+      background: var(--navy-800);
+      color: #fff !important;
+      padding: 10px 18px;
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.7);
+    }
+    .nav-item-cta::after { display: none; }
+    .nav-item-cta:hover {
+      background: var(--navy-700);
+      color: #fff !important;
+    }
+
+    .nav-dd-wrap { position: relative; }
+    .nav-dd {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      min-width: 250px;
+      padding: 8px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow:
+        0 24px 48px -22px rgba(11, 29, 56, 0.35),
+        0 4px 12px -6px rgba(11, 29, 56, 0.08);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%) translateY(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+      z-index: 100;
+    }
+    .nav-dd::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: -12px;
+      height: 12px;
+    }
+    .nav-dd-sm { min-width: 215px; }
+    .nav-dd-wrap:hover .nav-dd,
+    .nav-dd-wrap:focus-within .nav-dd {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dd-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #47546B;
+      text-decoration: none;
+      transition: background 0.22s ease, color 0.22s ease;
+    }
+    .dd-item i {
+      width: 16px;
+      font-size: 0.72rem;
+      color: #9AA7B8;
+      text-align: center;
+      transition: color 0.22s ease;
+    }
+    .dd-item:hover {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.06);
+    }
+    .dd-item:hover i { color: var(--navy-700); }
+
+    .hamburger-btn {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--line);
+      transition: background 0.25s ease, border-color 0.25s ease;
+      flex-shrink: 0;
+    }
+    .hamburger-btn:hover {
+      background: rgba(16, 42, 76, 0.05);
+      border-color: #CBD9E8;
+    }
+    .h-line {
+      position: absolute;
+      width: 18px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--navy-800);
+      transition: transform 0.35s ease, opacity 0.25s ease;
+    }
+    .h-line:nth-child(1) { transform: translateY(-6px); }
+    .h-line:nth-child(3) { transform: translateY(6px); }
+    #mobileMenuBtn.open .h-line:nth-child(1) { transform: rotate(45deg); }
+    #mobileMenuBtn.open .h-line:nth-child(2) { transform: translateX(30px); opacity: 0; }
+    #mobileMenuBtn.open .h-line:nth-child(3) { transform: rotate(-45deg); }
+
+    .mobile-menu-wrap {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.45s ease, opacity 0.35s ease;
+    }
+    .mobile-menu-wrap.open { max-height: 900px; opacity: 1; }
+    .mobile-menu-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 14px 0 18px;
+      border-top: 1px solid var(--line);
+    }
+    .m-item, .m-toggle {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #47546B;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.22s ease, color 0.22s ease;
+    }
+    .m-item i, .m-toggle i:not(.chev) {
+      width: 18px;
+      font-size: 0.85rem;
+      color: var(--navy-700);
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .m-item:hover, .m-toggle:hover {
+      background: rgba(16, 42, 76, 0.055);
+      color: var(--navy-800);
+    }
+    .m-item-cta {
+      justify-content: center;
+      margin-top: 6px;
+      color: #fff !important;
+      background: var(--navy-800);
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.6);
+    }
+    .m-item-cta i { color: #fff !important; }
+    .m-item-cta:hover { background: var(--navy-700); color: #fff !important; }
+    .m-toggle .chev {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #9AA7B8;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .m-toggle.open .chev { transform: rotate(180deg); color: var(--navy-700); }
+    .m-sub {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 4px 0 6px 28px;
+    }
+    .m-sub a {
+      padding: 9px 14px;
+      border-radius: 6px;
+      border-left: 2px solid transparent;
+      font-size: 0.83rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+    }
+    .m-sub a:hover {
+      background: rgba(16, 42, 76, 0.05);
+      color: var(--navy-800);
+      border-left-color: var(--navy-700);
+    }
+
+    /* ============================================================
+       5. HAIRLINE
+       ============================================================ */
+    .hairline {
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        var(--line) 12%,
+        var(--line) 88%,
+        transparent 100%);
+    }
+
+    /* ============================================================
+       6. FADE UP
+       ============================================================ */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-up { animation: fadeInUp 0.7s ease-out both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ============================================================
+       7. SECTION HEADING
+       ============================================================ */
+    .section-heading {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+    .section-heading::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--navy-800), var(--navy-600));
+    }
+
+    /* ============================================================
+       8. ARTICLE HERO
+       ============================================================ */
+    .article-hero {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 440px;
+      display: flex;
+      align-items: flex-end;
+      background: var(--navy-900);
+      box-shadow: 0 24px 60px -30px rgba(11, 29, 56, 0.5);
+    }
+    @media (min-width: 768px) { .article-hero { min-height: 520px; } }
+
+    .article-hero-img {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .article-hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg,
+        rgba(11,29,56,0.15) 0%,
+        rgba(11,29,56,0.55) 40%,
+        rgba(11,29,56,0.95) 100%);
+      z-index: 2;
+    }
+
+    .article-hero-content {
+      position: relative;
+      z-index: 5;
+      padding: 2rem 1.75rem;
+      width: 100%;
+    }
+    @media (min-width: 768px) {
+      .article-hero-content { padding: 3rem 3rem; }
+    }
+
+    /* Category tag */
+    .cat-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Meta chip */
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      backdrop-filter: blur(8px);
+    }
+    .meta-chip i { color: var(--steel-light); font-size: 0.65rem; }
+
+    /* ============================================================
+       9. ARTICLE BODY
+       ============================================================ */
+    .article-body {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.125rem;
+      line-height: 1.85;
+      color: #334155;
+    }
+    .article-body p {
+      margin-bottom: 1.5rem;
+    }
+    /* Dropcap */
+    .dropcap::first-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: 4.5rem;
+      font-weight: 900;
+      float: left;
+      line-height: 0.85;
+      margin: 8px 14px 0 0;
+      color: var(--navy-700);
+    }
+
+    /* Heading di dalam artikel */
+    .article-body h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem;
+      font-weight: 900;
+      color: var(--navy-900);
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+      position: relative;
+      padding-left: 16px;
+    }
+    .article-body h2::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 6px; bottom: 6px;
+      width: 4px;
+      border-radius: 2px;
+      background: var(--navy-700);
+    }
+
+    /* Pull quote */
+    .pull-quote {
+      position: relative;
+      padding: 1.75rem 1.5rem 1.75rem 2.5rem;
+      margin: 2.5rem 0;
+      border-left: 4px solid var(--navy-700);
+      background: rgba(16, 42, 76, 0.04);
+      border-radius: 0 8px 8px 0;
+    }
+    .pull-quote p {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.35rem !important;
+      font-weight: 700;
+      font-style: italic;
+      line-height: 1.45 !important;
+      color: var(--navy-900) !important;
+      margin-bottom: 1rem !important;
+    }
+    .pull-quote cite {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: var(--navy-700);
+    }
+    .pull-quote cite::before {
+      content: '— ';
+      color: var(--muted);
+    }
+
+    /* Inline figure */
+    .inline-figure {
+      margin: 2.5rem 0;
+    }
+    .inline-figure img {
+      border-radius: 8px;
+      width: 100%;
+      box-shadow: 0 12px 30px -18px rgba(11, 29, 56, 0.3);
+    }
+    .inline-figure figcaption {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 12px;
+      padding-left: 14px;
+      border-left: 3px solid var(--navy-700);
+      line-height: 1.5;
+      font-style: italic;
+    }
+    .inline-figure figcaption strong {
+      color: var(--navy-700);
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    /* Key facts box */
+    .key-facts {
+      position: relative;
+      background: #F9FBFD;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.75rem 1.5rem 1.5rem;
+      margin: 2.5rem 0;
+    }
+    .key-facts-title {
+      position: absolute;
+      top: -12px;
+      left: 1.5rem;
+      background: var(--navy-800);
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .fact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px dashed var(--line);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .fact-item:last-child { border-bottom: none; }
+    .fact-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: rgba(16, 42, 76, 0.07);
+      color: var(--navy-700);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .fact-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .fact-value {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--navy-900);
+      margin-top: 2px;
+    }
+
+    /* ============================================================
+       10. TOOLBAR (font control + share)
+       ============================================================ */
+    .toolbar-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .font-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      background: #F4F6F9;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 3px;
+    }
+    .font-btn {
+      width: 32px; height: 32px;
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800;
+      font-size: 0.72rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .font-btn:hover {
+      background: rgba(16, 42, 76, 0.06);
+      color: var(--navy-800);
+    }
+    .font-btn.active {
+      background: var(--navy-800);
+      color: #fff;
+    }
+
+    .share-btn {
+      width: 34px; height: 34px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      background: #F4F6F9;
+      border: 1px solid var(--line);
+      color: #47546B;
+      transition: all 0.22s ease;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    .share-btn:hover {
+      background: var(--navy-800);
+      border-color: var(--navy-800);
+      color: #fff;
+    }
+
+    /* ============================================================
+       11. TOC CARD
+       ============================================================ */
+    .toc-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+    .toc-link {
+      display: block;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      transition: all 0.22s ease;
+      border-left: 3px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .toc-link:hover {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.04);
+    }
+    .toc-link.active {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.06);
+      border-left-color: var(--navy-700);
+      font-weight: 700;
+    }
+
+    /* Reading progress mini */
+    .progress-track-mini {
+      height: 4px;
+      background: rgba(16, 42, 76, 0.08);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-fill-mini {
+      height: 100%;
+      background: linear-gradient(90deg, var(--navy-700), var(--navy-600));
+      border-radius: 9999px;
+      transition: width 0.2s linear;
+    }
+
+    /* ============================================================
+       12. MINI ARTICLE (sidebar)
+       ============================================================ */
+    .mini-article {
+      display: flex;
+      gap: 12px;
+      padding: 10px;
+      border-radius: 8px;
+      transition: background 0.22s ease;
+      cursor: pointer;
+    }
+    .mini-article:hover {
+      background: rgba(16, 42, 76, 0.04);
+    }
+    .mini-img {
+      width: 60px; height: 60px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid var(--line);
+    }
+
+    /* ============================================================
+       13. AUTHOR BOX
+       ============================================================ */
+    .author-box {
+      background: #F9FBFD;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .author-avatar {
+      width: 68px; height: 68px;
+      border-radius: 10px;
+      background: linear-gradient(140deg, var(--navy-700), var(--navy-900));
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.35rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       14. PREV/NEXT NAV
+       ============================================================ */
+    .nav-card {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.25rem 1.35rem;
+      transition: all 0.3s ease;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+    }
+    .nav-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--navy-800);
+      transform: scaleY(0.15);
+      transform-origin: top;
+      transition: transform 0.4s ease;
+    }
+    .nav-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 38px -22px rgba(11, 29, 56, 0.3);
+      border-color: #CBD9E8;
+    }
+    .nav-card:hover::before { transform: scaleY(1); }
+
+    .nav-label {
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .nav-label i { color: var(--navy-700); }
+
+    /* ============================================================
+       15. RELATED CARD
+       ============================================================ */
+    .related-card {
+      position: relative;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .related-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 42px -24px rgba(11, 29, 56, 0.32);
+      border-color: #CBD9E8;
+    }
+    .related-img-wrap {
+      position: relative;
+      overflow: hidden;
+      background: var(--page);
+    }
+    .related-img-wrap img {
+      transition: transform 0.6s ease;
+    }
+    .related-card:hover .related-img-wrap img {
+      transform: scale(1.05);
+    }
+    .related-badge {
+      position: absolute;
+      top: 12px; left: 12px;
+      font-size: 0.6rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #fff;
+    }
+    .badge-diklat  { background: var(--navy-800); }
+    .badge-prestasi { background: #92400E; }
+    .badge-penyelamatan { background: #0F5132; }
+
+    /* ============================================================
+       16. CTA DARURAT (sidebar)
+       ============================================================ */
+    .cta-darurat {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    /* ============================================================
+       17. QUOTE BANNER
+       ============================================================ */
+    .quote-banner {
+      background: linear-gradient(140deg, var(--navy-800), var(--navy-900));
+      border-radius: 10px;
+      box-shadow: 0 24px 48px -22px rgba(11, 29, 56, 0.5);
+    }
+
+    /* ============================================================
+       18. FOOTER
+       ============================================================ */
+    .site-footer {
+      background: linear-gradient(165deg, #102A4C 0%, #0B1D38 100%);
+      color: #E6EDF5;
+    }
+
+    /* ============================================================
+       19. RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1023px) {
+      .nav-inner { height: 68px; }
+      .logo-badge { width: 40px; height: 40px; font-size: 0.95rem; border-radius: 9px; }
+    }
+  </style>
+</head>
+
+<body class="antialiased">
+
+  <div id="scrollProgress"></div>
+
+  <!-- ================= NAVBAR ================= -->
+  <header id="navbar" class="site-header">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <nav class="nav-inner" aria-label="Navigasi utama">
+
+        <a href="index.html" class="brand-group">
+          <div class="logo-badge">
+            <i class="fas fa-fire-extinguisher"></i>
+          </div>
+          <div class="leading-tight">
+            <span class="block text-sm sm:text-base font-extrabold tracking-tight text-slate-800">Dinas Damkar</span>
+            <span class="block text-[8px] sm:text-[9px] font-semibold text-[#173A66] uppercase tracking-[0.15em] sm:tracking-[0.18em]">Pemadam &amp; Penyelamat</span>
+          </div>
+        </a>
+
+        <div class="hidden lg:flex items-center gap-1">
+          <a href="index.html" class="nav-item">Beranda</a>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item" type="button">
+              Profil PD <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd">
+              <a href="profile.html" class="dd-item"><i class="fas fa-user-tie"></i><span>Profil Pimpinan</span></a>
+              <a href="sejarah.html" class="dd-item"><i class="fas fa-book-open"></i><span>Sejarah</span></a>
+              <a href="struktur.html" class="dd-item"><i class="fas fa-sitemap"></i><span>Struktur Organisasi</span></a>
+              <a href="visimisi.html" class="dd-item"><i class="fas fa-compass"></i><span>Visi dan Misi</span></a>
+              <a href="tugas.html" class="dd-item"><i class="fas fa-list-check"></i><span>Tugas dan Fungsi</span></a>
+            </div>
+          </div>
+
+          <a href="program.html" class="nav-item">Program</a>
+          <a href="agenda.html" class="nav-item">Agenda Pimpinan</a>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item active" type="button">
+              Publikasi <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd nav-dd-sm">
+              <a href="berita.html" class="dd-item"><i class="fas fa-newspaper"></i><span>Berita</span></a>
+              <a href="detail.html" class="dd-item"><i class="fas fa-file-lines"></i><span>Detail Berita</span></a>
+            </div>
+          </div>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item" type="button">
+              Dokumentasi <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd nav-dd-sm">
+              <a href="galeri.html" class="dd-item"><i class="fas fa-images"></i><span>Galeri Foto</span></a>
+              <a href="video.html" class="dd-item"><i class="fas fa-video"></i><span>Video Kegiatan</span></a>
+            </div>
+          </div>
+
+          <a href="kritik.html" class="nav-item nav-item-cta">Kritik &amp; Saran</a>
+        </div>
+
+        <button id="mobileMenuBtn" class="lg:hidden hamburger-btn" aria-label="Buka menu" aria-expanded="false">
+          <span class="h-line"></span>
+          <span class="h-line"></span>
+          <span class="h-line"></span>
+        </button>
+      </nav>
+    </div>
+
+    <div id="mobileMenu" class="mobile-menu-wrap lg:hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mobile-menu-inner">
+          <a href="index.html" class="m-item"><i class="fas fa-home"></i> Beranda</a>
+
+          <div class="m-toggle" data-toggle="m-profil">
+            <i class="fas fa-building"></i> <span>Profil PD</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-profil" class="hidden m-sub">
+            <a href="profile.html">Profil Pimpinan</a>
+            <a href="sejarah.html">Sejarah</a>
+            <a href="struktur.html">Struktur Organisasi</a>
+            <a href="visimisi.html">Visi &amp; Misi</a>
+            <a href="tugas.html">Tugas &amp; Fungsi</a>
+          </div>
+
+          <a href="program.html" class="m-item"><i class="fas fa-clipboard-list"></i> Program</a>
+          <a href="agenda.html" class="m-item"><i class="fas fa-calendar-alt"></i> Agenda Pimpinan</a>
+
+          <div class="m-toggle" data-toggle="m-publikasi">
+            <i class="fas fa-bullhorn"></i> <span>Publikasi</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-publikasi" class="hidden m-sub">
+            <a href="berita.html">Berita</a>
+            <a href="detail.html">Detail Berita</a>
+          </div>
+
+          <div class="m-toggle" data-toggle="m-dok">
+            <i class="fas fa-camera"></i> <span>Dokumentasi</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-dok" class="hidden m-sub">
+            <a href="galeri.html">Galeri Foto</a>
+            <a href="video.html">Video Kegiatan</a>
+          </div>
+
+          <a href="kritik.html" class="m-item m-item-cta"><i class="fas fa-comment-dots"></i> Kritik &amp; Saran</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN ================= -->
+  <main class="w-full relative">
+
+    <!-- PAGE HEADER -->
+    <section class="pt-12 pb-6 animate-fade-up">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav class="inline-flex items-center gap-2 text-xs font-semibold text-slate-500">
+          <a href="index.html" class="hover:text-[#173A66] transition flex items-center gap-1.5"><i class="fas fa-home"></i> Beranda</a>
+          <i class="fas fa-chevron-right text-[9px] text-slate-400"></i>
+          <a href="berita.html" class="hover:text-[#173A66] transition">Berita</a>
+          <i class="fas fa-chevron-right text-[9px] text-slate-400"></i>
+          <span class="text-[#173A66] truncate max-w-[120px] md:max-w-none">Simulasi Evakuasi</span>
+        </nav>
+      </div>
+    </section>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-6">
+      <div class="hairline"></div>
+    </div>
+
+    <!-- ============ ARTICLE HERO ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+      <div class="article-hero animate-fade-up">
+        <div class="article-hero-img" style="background-image: url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2000&auto=format&fit=crop');"></div>
+
+        <div class="article-hero-content">
+          <div class="flex flex-wrap items-center gap-2 mb-5">
+            <span class="cat-tag"><i class="fas fa-fire"></i> Kebakaran</span>
+            <span class="meta-chip"><i class="far fa-clock"></i> 5 menit baca</span>
+            <span class="meta-chip"><i class="far fa-calendar"></i> 12 Juni 2025</span>
+          </div>
+
+          <h1 class="font-serif text-3xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-5 max-w-4xl" style="font-family: 'Playfair Display', serif;">
+            Simulasi Evakuasi Gedung Bertingkat: 150 Peserta, Satu Tujuan, Nol Korban
+          </h1>
+
+          <p class="text-slate-200 text-base md:text-lg leading-relaxed max-w-3xl mb-6" style="font-family: 'Lora', serif;">
+            Skenario kebakaran lantai 12 diuji dengan waktu respons di bawah 5 menit. Ratusan penghuni gedung berhasil dievakuasi tanpa satu pun korban jiwa — hasil kerja sama, disiplin, dan latihan yang tiada henti.
+          </p>
+
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-lg bg-white/15 border border-white/25 flex items-center justify-center text-white text-sm font-extrabold backdrop-blur">
+              HN
+            </div>
+            <div>
+              <p class="text-white font-bold text-sm">Humas Dinas Damkar</p>
+              <p class="text-slate-300 text-xs">Redaksi Publikasi Damkar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ MAIN: ARTICLE + SIDEBAR ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- ARTICLE BODY -->
+        <div class="lg:col-span-8">
+
+          <!-- Toolbar -->
+          <div class="toolbar-card mb-8 animate-fade-up">
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:inline">Ukuran Teks</span>
+              <div class="font-control">
+                <button class="font-btn" data-size="small" title="Kecil">A-</button>
+                <button class="font-btn active" data-size="normal" title="Normal">A</button>
+                <button class="font-btn" data-size="large" title="Besar">A+</button>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-500 uppercase tracking-wider hidden md:inline">Bagikan</span>
+              <a href="#" class="share-btn" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+              <a href="#" class="share-btn" title="Twitter"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="share-btn" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+              <a href="#" class="share-btn" title="Copy Link" id="copyLinkBtn2"><i class="fas fa-link"></i></a>
+            </div>
+          </div>
+
+          <!-- ARTICLE -->
+          <article class="article-body animate-fade-up delay-1" id="articleBody" style="font-size: 1.125rem;">
+
+            <p class="dropcap" id="section-1">
+              Pagi itu langit Kota Sejahtera masih bersih. Namun di lantai 12 sebuah gedung perkantoran di kawasan pusat bisnis, simulasi kebakaran berskala besar tengah berlangsung. Suara alarm berbunyi nyaring, memecah kesunyian pagi. Seratus lima puluh peserta — karyawan, petugas keamanan, hingga tim medis — bergerak cepat menuju titik evakuasi. Latihan ini bukan sekadar formalitas; ini adalah ujian nyata dari kesiapsiagaan yang sesungguhnya.
+            </p>
+
+            <p>
+              Simulasi yang digelar pada Rabu, 12 Juni 2025, ini melibatkan 40 personel Dinas Pemadam Kebakaran dan Penyelamatan bersama 150 peserta yang terdiri dari karyawan dan penghuni gedung. Skenario yang diangkat adalah kebakaran di lantai 12 dengan sumber api yang diduga berasal dari korsleting listrik — salah satu penyebab utama kebakaran gedung bertingkat di Indonesia.
+            </p>
+
+            <!-- PULL QUOTE -->
+            <div class="pull-quote">
+              <p>Latihan bukan untuk menakuti, tetapi untuk menyelamatkan. Ketika panik datang, hanya disiplin yang menyelamatkan.</p>
+              <cite>Drs. Ir. Bakti Nugraha, M.T. — Kepala Dinas Damkar &amp; Penyelamatan</cite>
+            </div>
+
+            <h2 id="section-2">Tiga Fase Simulasi</h2>
+
+            <p>
+              Simulasi dibagi menjadi tiga fase utama. Fase pertama adalah deteksi dini dan alarm, di mana sistem fire alarm mendeteksi asap dan secara otomatis mengaktifkan seluruh prosedur darurat. Dalam waktu 30 detik, seluruh lantai menerima notifikasi evakuasi melalui sirine dan pengumuman suara.
+            </p>
+
+            <p>
+              Fase kedua adalah evakuasi mandiri. Peserta diarahkan menuju jalur evakuasi yang telah ditentukan, menggunakan tangga darurat — bukan lift. Di sini, kemampuan peserta dalam mengikuti SOP benar-benar diuji, terutama saat harus menghadapi kepadatan di tangga.
+            </p>
+
+            <!-- INLINE FIGURE -->
+            <figure class="inline-figure">
+              <img src="https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=1400&auto=format&fit=crop" alt="Tim Damkar sedang mengevakuasi peserta simulasi">
+              <figcaption>
+                <strong>Dokumentasi:</strong> Tim Damkar memandu peserta menuruni tangga darurat selama simulasi evakuasi di gedung perkantoran, Rabu (12/6).
+              </figcaption>
+            </figure>
+
+            <p>
+              Fase ketiga adalah penyelamatan dan pemadaman. Tim rescue melakukan pencarian korban di lantai-lantai yang terdampak dengan teknik <em>primary search</em> dan <em>secondary search</em>. Sementara itu, tim pemadam mengerahkan tiga unit mobil pemadam dengan sistem water canon untuk memadamkan api di lantai sumber.
+            </p>
+
+            <!-- KEY FACTS BOX -->
+            <div class="key-facts">
+              <span class="key-facts-title">Fakta Penting</span>
+              <div class="fact-item">
+                <div class="fact-icon"><i class="fas fa-users"></i></div>
+                <div class="fact-text">
+                  <div class="fact-label">Total Peserta</div>
+                  <div class="fact-value">150 orang (karyawan, keamanan, tim medis)</div>
+                </div>
+              </div>
+              <div class="fact-item">
+                <div class="fact-icon"><i class="fas fa-stopwatch"></i></div>
+                <div class="fact-text">
+                  <div class="fact-label">Waktu Respons</div>
+                  <div class="fact-value">4 menit 38 detik dari alarm hingga lokasi</div>
+                </div>
+              </div>
+              <div class="fact-item">
+                <div class="fact-icon"><i class="fas fa-truck-fast"></i></div>
+                <div class="fact-text">
+                  <div class="fact-label">Armada Dikerahkan</div>
+                  <div class="fact-value">6 unit (3 pemadam, 1 rescue, 1 ambulance, 1 komando)</div>
+                </div>
+              </div>
+              <div class="fact-item">
+                <div class="fact-icon"><i class="fas fa-clipboard-check"></i></div>
+                <div class="fact-text">
+                  <div class="fact-label">Hasil</div>
+                  <div class="fact-value">Seluruh peserta tereksekusi, 0 korban, 0 cedera</div>
+                </div>
+              </div>
+            </div>
+
+            <h2 id="section-3">Sinergi Lintas Sektor</h2>
+
+            <p>
+              Simulasi ini bukan kerja tunggal Dinas Damkar. BPBD, Dinas Kesehatan, Satpol PP, hingga manajemen gedung turut dilibatkan dalam perencanaan dan pelaksanaan. Menurut Kepala Bidang Operasi, Ir. Andi Prasetyo, M.M., sinergi ini adalah kunci utama.
+            </p>
+
+            <p>
+              "Tidak mungkin kami bekerja sendiri. Penanganan darurat adalah orkestra banyak pihak. Yang terpenting adalah setiap orang tahu perannya, tahu kapan harus bergerak, dan tahu ke mana harus melangkah," ujarnya saat ditemui di lokasi.
+            </p>
+
+            <p>
+              Ke depan, Dinas Damkar menargetkan simulasi serupa digelar minimal satu kali per kuartal di gedung-gedung dengan ketinggian di atas 8 lantai. Hal ini sejalan dengan Peraturan Daerah tentang Retribusi dan Pengawasan Proteksi Kebakaran yang tengah disosialisasikan.
+            </p>
+
+            <h2 id="section-4">Pesan untuk Masyarakat</h2>
+
+            <p>
+              Kepala Dinas menegaskan bahwa edukasi kebakaran bukan hanya tanggung jawab petugas. Setiap warga, setiap karyawan, setiap keluarga memiliki peran penting dalam pencegahan dan penanganan awal.
+            </p>
+
+            <p>
+              "Kenali jalur evakuasi di tempat Anda bekerja atau tinggal. Ketahui letak APAR terdekat. Jangan pernah menganggap remeh latihan kecil. Karena ketika api benar-benar datang, hanya mereka yang terbiasa yang bisa bertindak tenang," tutupnya.
+            </p>
+
+            <p>
+              Simulasi diakhiri dengan sesi evaluasi bersama seluruh peserta. Berbagai catatan perbaikan dicatat — mulai dari kecepatan respons, koordinasi antar tim, hingga kesiapan alat komunikasi. Semua demi satu tujuan: nol korban.
+            </p>
+
+          </article>
+
+          <!-- TAGS -->
+          <div class="mt-10 pt-8 border-t border-[#E3E9F1] animate-fade-up">
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Tags</p>
+            <div class="flex flex-wrap gap-2">
+              <a href="#" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-[#E3E9F1] rounded-md text-xs font-semibold text-[#173A66] hover:bg-[#173A66] hover:text-white hover:border-[#173A66] transition">
+                <i class="fas fa-hashtag text-[9px]"></i> Simulasi Evakuasi
+              </a>
+              <a href="#" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-[#E3E9F1] rounded-md text-xs font-semibold text-[#173A66] hover:bg-[#173A66] hover:text-white hover:border-[#173A66] transition">
+                <i class="fas fa-hashtag text-[9px]"></i> Kesiapsiagaan
+              </a>
+              <a href="#" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-[#E3E9F1] rounded-md text-xs font-semibold text-[#173A66] hover:bg-[#173A66] hover:text-white hover:border-[#173A66] transition">
+                <i class="fas fa-hashtag text-[9px]"></i> Gedung Bertingkat
+              </a>
+              <a href="#" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-[#E3E9F1] rounded-md text-xs font-semibold text-[#173A66] hover:bg-[#173A66] hover:text-white hover:border-[#173A66] transition">
+                <i class="fas fa-hashtag text-[9px]"></i> Rescue
+              </a>
+              <a href="#" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-[#E3E9F1] rounded-md text-xs font-semibold text-[#173A66] hover:bg-[#173A66] hover:text-white hover:border-[#173A66] transition">
+                <i class="fas fa-hashtag text-[9px]"></i> K3
+              </a>
+            </div>
+          </div>
+
+          <!-- AUTHOR BOX -->
+          <div class="author-box mt-8 animate-fade-up">
+            <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+              <div class="author-avatar">HN</div>
+              <div class="text-center sm:text-left flex-1">
+                <p class="text-[10px] font-bold text-[#173A66] uppercase tracking-widest mb-1">Ditulis oleh</p>
+                <h3 class="text-lg font-extrabold text-slate-800">Humas Dinas Damkar</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Redaksi Publikasi Dinas Pemadam Kebakaran dan Penyelamatan</p>
+                <p class="text-sm text-slate-600 leading-relaxed mt-3">
+                  Menyampaikan informasi terkini seputar kegiatan, program, dan layanan Dinas Damkar &amp; Penyelamatan kepada masyarakat.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- PREV/NEXT -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 animate-fade-up">
+            <a href="#" class="nav-card">
+              <div class="nav-label"><i class="fas fa-arrow-left"></i> Berita Sebelumnya</div>
+              <h3 class="text-base font-bold text-slate-800 leading-snug hover:text-[#173A66] transition">Penyelamatan Kucing di Pohon Setinggi 15 Meter</h3>
+              <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5"><i class="far fa-calendar"></i> 10 Juni 2025</p>
+            </a>
+            <a href="#" class="nav-card sm:text-right">
+              <div class="nav-label sm:justify-end">
+                Berita Selanjutnya <i class="fas fa-arrow-right ml-1"></i>
+              </div>
+              <h3 class="text-base font-bold text-slate-800 leading-snug hover:text-[#173A66] transition">Pelatihan Damkar untuk 200 Relawan Baru</h3>
+              <p class="text-xs text-slate-500 mt-2 flex items-center gap-1.5 sm:justify-end"><i class="far fa-calendar"></i> 8 Juni 2025</p>
+            </a>
+          </div>
+
+        </div>
+
+        <!-- SIDEBAR -->
+        <aside class="lg:col-span-4">
+          <div class="lg:sticky lg:top-28 space-y-5">
+
+            <!-- TOC + Progress -->
+            <div class="toc-card animate-fade-up">
+              <div class="flex items-center gap-2 mb-3">
+                <div class="w-8 h-8 rounded-md bg-[#173A66] flex items-center justify-center text-white">
+                  <i class="fas fa-list-ul text-xs"></i>
+                </div>
+                <div>
+                  <p class="text-[10px] font-bold text-[#173A66] uppercase tracking-widest">Daftar Isi</p>
+                  <h3 class="text-sm font-extrabold text-slate-800">Navigasi Artikel</h3>
+                </div>
+              </div>
+
+              <div class="mb-4 pt-3 border-t border-[#E3E9F1]">
+                <div class="flex items-center justify-between mb-2 text-[10px]">
+                  <span class="font-bold text-slate-500 uppercase tracking-wider">Progress</span>
+                  <span class="font-extrabold text-[#173A66]" id="progressText">0%</span>
+                </div>
+                <div class="progress-track-mini">
+                  <div class="progress-fill-mini" id="readingProgressFill" style="width: 0%;"></div>
+                </div>
+              </div>
+
+              <nav class="space-y-1" id="tocNav">
+                <a class="toc-link active" data-target="section-1">Pendahuluan</a>
+                <a class="toc-link" data-target="section-2">Tiga Fase Simulasi</a>
+                <a class="toc-link" data-target="section-3">Sinergi Lintas Sektor</a>
+                <a class="toc-link" data-target="section-4">Pesan untuk Masyarakat</a>
+              </nav>
+            </div>
+
+            <!-- Mini articles -->
+            <div class="toc-card animate-fade-up delay-1">
+              <div class="flex items-center gap-2 mb-3 pb-3 border-b border-[#E3E9F1]">
+                <div class="w-8 h-8 rounded-md bg-[#173A66] flex items-center justify-center text-white">
+                  <i class="fas fa-newspaper text-xs"></i>
+                </div>
+                <div>
+                  <p class="text-[10px] font-bold text-[#173A66] uppercase tracking-widest">Terkait</p>
+                  <h3 class="text-sm font-extrabold text-slate-800">Berita Lainnya</h3>
+                </div>
+              </div>
+
+              <div class="space-y-1">
+                <div class="mini-article">
+                  <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=400&auto=format&fit=crop" alt="Berita" class="mini-img">
+                  <div>
+                    <h4 class="text-xs font-bold text-slate-800 leading-snug hover:text-[#173A66] transition cursor-pointer">Penyelamatan Kucing di Pohon Tinggi</h4>
+                    <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 10 Jun 2025</p>
+                  </div>
+                </div>
+
+                <div class="mini-article">
+                  <img src="https://images.unsplash.com/photo-1588612466924-ef3b0e6a60b1?q=80&w=400&auto=format&fit=crop" alt="Berita" class="mini-img">
+                  <div>
+                    <h4 class="text-xs font-bold text-slate-800 leading-snug hover:text-[#173A66] transition cursor-pointer">Pelatihan Damkar untuk Relawan</h4>
+                    <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 8 Jun 2025</p>
+                  </div>
+                </div>
+
+                <div class="mini-article">
+                  <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=400&auto=format&fit=crop" alt="Berita" class="mini-img">
+                  <div>
+                    <h4 class="text-xs font-bold text-slate-800 leading-snug hover:text-[#173A66] transition cursor-pointer">Edukasi Damkar Cilik di 50 TK</h4>
+                    <p class="text-[10px] text-slate-400 mt-1 flex items-center gap-1.5"><i class="far fa-calendar"></i> 5 Jun 2025</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA Darurat -->
+            <div class="cta-darurat animate-fade-up delay-2">
+              <div class="flex items-center gap-2 mb-3">
+                <span class="relative flex h-2 w-2">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                </span>
+                <span class="text-[10px] font-bold text-red-600 uppercase tracking-widest">Darurat</span>
+              </div>
+              <h3 class="font-extrabold text-slate-800 text-base mb-1">Butuh Bantuan Segera?</h3>
+              <p class="text-xs text-slate-500 leading-relaxed mb-3">Hubungi layanan darurat 24 jam kami tanpa pulsa.</p>
+              <a href="tel:112" class="flex items-center justify-center gap-2 bg-[#173A66] hover:bg-[#102A4C] text-white font-bold text-sm py-2.5 rounded-md transition">
+                <i class="fas fa-phone-volume"></i> Hubungi 112
+              </a>
+            </div>
+
+          </div>
+        </aside>
+
+      </div>
+    </section>
+
+    <!-- ============ RELATED ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+      <div class="text-center mb-10">
+        <p class="text-xs font-bold text-[#173A66] uppercase tracking-wider mb-2">Baca Juga</p>
+        <h2 class="text-2xl md:text-3xl font-bold text-slate-800 section-heading">Berita Terkait</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+        <article class="related-card animate-fade-up">
+          <div class="related-img-wrap h-48">
+            <img src="https://images.unsplash.com/photo-1588612466924-ef3b0e6a60b1?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+            <span class="related-badge badge-diklat">Diklat</span>
+          </div>
+          <div class="p-5">
+            <p class="text-xs text-slate-400 flex items-center gap-1.5 mb-2"><i class="far fa-calendar"></i> 8 Juni 2025</p>
+            <h3 class="font-bold text-slate-800 text-base leading-snug mb-2 hover:text-[#173A66] transition cursor-pointer">Pelatihan Damkar untuk 200 Relawan Baru</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Pembekalan teknik pemadaman awal dan evakuasi korban bagi relawan dari 20 kelurahan.</p>
+          </div>
+        </article>
+
+        <article class="related-card animate-fade-up delay-1">
+          <div class="related-img-wrap h-48">
+            <img src="https://images.unsplash.com/photo-1567427017947-545c5f8d16ad?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+            <span class="related-badge badge-prestasi">Prestasi</span>
+          </div>
+          <div class="p-5">
+            <p class="text-xs text-slate-400 flex items-center gap-1.5 mb-2"><i class="far fa-calendar"></i> 3 Juni 2025</p>
+            <h3 class="font-bold text-slate-800 text-base leading-snug mb-2 hover:text-[#173A66] transition cursor-pointer">Dinas Damkar Raih Penghargaan Pelayanan Prima 2025</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Penghargaan dari KemenPAN-RB atas inovasi layanan darurat 112 dan digitalisasi command center.</p>
+          </div>
+        </article>
+
+        <article class="related-card animate-fade-up delay-2">
+          <div class="related-img-wrap h-48">
+            <img src="https://images.unsplash.com/photo-1547683905-f686c993aae5?q=80&w=1000&auto=format&fit=crop" alt="Berita" class="w-full h-full object-cover">
+            <span class="related-badge badge-penyelamatan">Penyelamatan</span>
+          </div>
+          <div class="p-5">
+            <p class="text-xs text-slate-400 flex items-center gap-1.5 mb-2"><i class="far fa-calendar"></i> 28 Mei 2025</p>
+            <h3 class="font-bold text-slate-800 text-base leading-snug mb-2 hover:text-[#173A66] transition cursor-pointer">Evakuasi 12 Warga Terjebak Banjir di Sukamaju</h3>
+            <p class="text-sm text-slate-500 leading-relaxed">Tim rescue bersama BPBD mengevakuasi 12 warga menggunakan perahu karet saat banjir merendam permukiman.</p>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="text-center mt-10">
+        <a href="berita.html" class="inline-flex items-center gap-2 bg-white border border-[#E3E9F1] hover:border-[#173A66] text-[#173A66] font-bold text-sm px-6 py-3 rounded-md transition">
+          <i class="fas fa-newspaper"></i> Lihat Semua Berita
+        </a>
+      </div>
+    </section>
+
+    <!-- ============ QUOTE ============ -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
+      <div class="quote-banner relative overflow-hidden p-10 md:p-14 text-center animate-fade-up">
+        <div class="absolute -top-10 -right-10 w-48 h-48 rounded-full bg-white/5"></div>
+        <div class="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-white/[0.03]"></div>
+
+        <div class="relative z-10">
+          <i class="fas fa-book-open text-white/40 text-3xl mb-6"></i>
+          <p class="text-white text-xl md:text-2xl font-semibold leading-snug max-w-4xl mx-auto" style="font-family: 'Playfair Display', serif;">
+            Setiap berita adalah cerita tentang mereka yang berani bertindak saat yang lain memilih diam.
+          </p>
+          <div class="mt-8 flex items-center justify-center gap-3">
+            <div class="w-10 h-px bg-white/40"></div>
+            <p class="text-white/90 text-sm font-semibold">Publikasi Damkar 2025</p>
+            <div class="w-10 h-px bg-white/40"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer pt-16 pb-8 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-white">
+              <i class="fas fa-fire-extinguisher text-xl"></i>
+            </div>
+            <div>
+              <span class="block text-lg font-bold tracking-tight">Dinas Damkar</span>
+              <span class="block text-[10px] font-semibold text-[#9FB6CE] uppercase tracking-wider">Pemadam &amp; Penyelamat</span>
+            </div>
+          </div>
+          <p class="text-sm text-[#C6D5E5] leading-relaxed">
+            Melayani dengan dedikasi dan kemanusiaan. Siap 24/7 untuk melindungi masyarakat
+            dari bahaya kebakaran dan bencana lainnya.
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Hubungi Kami</h3>
+          <ul class="space-y-3 text-sm text-[#C6D5E5]">
+            <li class="flex items-start gap-3">
+              <i class="fas fa-map-marker-alt text-[#7FA3C7] mt-1"></i>
+              <span>Jl. Merdeka No. 123, Kota Sejahtera,<br>Provinsi Makmur, 12345</span>
+            </li>
+            <li class="flex items-center gap-3"><i class="fas fa-phone-alt text-[#7FA3C7]"></i><span>(021) 123-4567</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-envelope text-[#7FA3C7]"></i><span>info@damkar.go.id</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-clock text-[#7FA3C7]"></i><span>Layanan Darurat: 24 Jam</span></li>
+          </ul>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Ikuti Kami</h3>
+          <p class="text-sm text-[#C6D5E5] mb-4">
+            Dapatkan informasi terbaru seputar kegiatan dan layanan darurat melalui media sosial kami.
+          </p>
+          <div class="flex space-x-3">
+            <a href="#" aria-label="Facebook" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="YouTube" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
+          <ul class="space-y-2 text-sm text-[#C6D5E5]">
+            <li><a href="index.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Beranda</a></li>
+            <li><a href="profile.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Profil Dinas</a></li>
+            <li><a href="program.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Program Kerja</a></li>
+            <li><a href="berita.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Berita &amp; Agenda</a></li>
+            <li><a href="kritik.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Kritik &amp; Saran</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-white/12 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-[#9FB6CE]">
+        <p>&copy; 2026 Dinas Pemadam Kebakaran dan Penyelamatan. Hak Cipta Dilindungi.</p>
+        <div class="flex space-x-6 mt-4 md:mt-0">
+          <a href="#" class="hover:text-white transition">Kebijakan Privasi</a>
+          <a href="#" class="hover:text-white transition">Syarat &amp; Ketentuan</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= SCRIPT ================= -->
+  <script>
+    const navbar = document.getElementById('navbar');
+    const progressBar = document.getElementById('scrollProgress');
+
+    const onScroll = () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // Mobile menu
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenuBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      mobileMenuBtn.classList.toggle('open', isOpen);
+      mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        mobileMenuBtn.classList.remove('open');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.querySelectorAll('[data-toggle]').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const target = document.getElementById(trigger.dataset.toggle);
+        if (!target) return;
+        target.classList.toggle('hidden');
+        trigger.classList.toggle('open');
+      });
+    });
+
+    // Font size
+    const fontBtns = document.querySelectorAll('.font-btn');
+    const articleBody = document.getElementById('articleBody');
+    fontBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        fontBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const size = btn.dataset.size;
+        let fontSize = '1.125rem';
+        if (size === 'small') fontSize = '1rem';
+        if (size === 'large') fontSize = '1.3rem';
+        articleBody.style.fontSize = fontSize;
+      });
+    });
+
+    // Reading progress (sidebar)
+    const readingFill = document.getElementById('readingProgressFill');
+    const progressText = document.getElementById('progressText');
+
+    function updateReadingProgress() {
+      const articleTop = articleBody.offsetTop;
+      const articleHeight = articleBody.offsetHeight;
+      const scrolled = (window.scrollY + window.innerHeight * 0.5) - articleTop;
+      const percent = Math.min(100, Math.max(0, (scrolled / articleHeight) * 100));
+      if (readingFill) readingFill.style.width = percent + '%';
+      if (progressText) progressText.textContent = Math.round(percent) + '%';
+    }
+    window.addEventListener('scroll', updateReadingProgress);
+    window.addEventListener('resize', updateReadingProgress);
+    updateReadingProgress();
+
+    // TOC
+    const tocLinks = document.querySelectorAll('.toc-link');
+    const sections = ['section-1', 'section-2', 'section-3', 'section-4'].map(id => document.getElementById(id));
+
+    tocLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.getElementById(link.dataset.target);
+        if (target) {
+          window.scrollTo({ top: target.offsetTop - 120, behavior: 'smooth' });
+        }
+      });
+    });
+
+    function highlightTOC() {
+      const scrollY = window.scrollY + 150;
+      let activeIdx = 0;
+      sections.forEach((sec, idx) => {
+        if (sec && sec.offsetTop <= scrollY) activeIdx = idx;
+      });
+      tocLinks.forEach((link, idx) => {
+        link.classList.toggle('active', idx === activeIdx);
+      });
+    }
+    window.addEventListener('scroll', highlightTOC);
+    highlightTOC();
+
+    // Copy link
+    ['copyLinkBtn2'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = window.location.href;
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(url).then(() => {
+            const originalHTML = el.innerHTML;
+            el.innerHTML = '<i class="fas fa-check"></i>';
+            el.style.background = '#0F5132';
+            el.style.color = '#fff';
+            el.style.borderColor = '#0F5132';
+            setTimeout(() => {
+              el.innerHTML = originalHTML;
+              el.style.background = '';
+              el.style.color = '';
+              el.style.borderColor = '';
+            }, 1500);
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

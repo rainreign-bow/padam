@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dinas Damkar — Cepat Tanggap, Selamatkan Nyawa</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================================
+       1. DESIGN TOKENS — NAVY PEMADAM KEBAKARAN
+       ============================================================ */
+    :root {
+      --navy-900:    #0B1D38;
+      --navy-800:    #102A4C;
+      --navy-700:    #173A66;
+      --navy-600:    #215083;
+      --steel:       #4A7FB0;
+      --steel-light: #7FA3C7;
+      --steel-pale:  #DCE7F2;
+
+      --ink:         #152238;
+      --muted:       #64748B;
+      --line:        #E3E9F1;
+      --page:        #F4F6F9;
+      --glass:       rgba(255, 255, 255, 0.92);
+    }
+
+    /* ============================================================
+       2. BASE
+       ============================================================ */
+    * { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      color: var(--ink);
+      background-color: var(--page);
+      background-image:
+        radial-gradient(circle at 10% -8%, rgba(23, 58, 102, 0.055), transparent 42%),
+        radial-gradient(circle at 94% 4%, rgba(23, 58, 102, 0.04), transparent 38%),
+        linear-gradient(rgba(16, 42, 76, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 42, 76, 0.03) 1px, transparent 1px);
+      background-size: auto, auto, 56px 56px, 56px 56px;
+    }
+
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--page); }
+    ::-webkit-scrollbar-thumb { background: #B9C7D8; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--navy-700); }
+
+    /* ============================================================
+       3. SCROLL PROGRESS
+       ============================================================ */
+    #scrollProgress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0;
+      background: linear-gradient(90deg, var(--navy-600), var(--navy-900));
+      z-index: 9999;
+      transition: width 0.1s linear;
+    }
+
+    /* ============================================================
+       4. NAVBAR
+       ============================================================ */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: var(--glass);
+      backdrop-filter: blur(16px) saturate(170%);
+      -webkit-backdrop-filter: blur(16px) saturate(170%);
+      border-bottom: 1px solid var(--line);
+      transition: box-shadow 0.3s ease, background 0.3s ease;
+    }
+    #navbar.scrolled {
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 10px 28px -18px rgba(11, 29, 56, 0.35);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      height: 76px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      color: #fff;
+      background: linear-gradient(140deg, var(--navy-700), var(--navy-900));
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.6);
+      flex-shrink: 0;
+    }
+
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #47546B;
+      text-decoration: none;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: inherit;
+      transition: color 0.25s ease, background 0.25s ease;
+    }
+    .nav-item::after {
+      content: '';
+      position: absolute;
+      left: 14px; right: 14px; bottom: 3px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--navy-700);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+    .nav-item:hover,
+    .nav-item.active {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.055);
+    }
+    .nav-item:hover::after { transform: scaleX(1); }
+
+    .nav-item i.fa-chevron-down {
+      font-size: 9px;
+      opacity: 0.55;
+      transition: transform 0.3s ease;
+    }
+    .nav-item:hover i.fa-chevron-down { transform: rotate(180deg); }
+
+    .nav-item-cta {
+      background: var(--navy-800);
+      color: #fff !important;
+      padding: 10px 18px;
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.7);
+    }
+    .nav-item-cta::after { display: none; }
+    .nav-item-cta:hover {
+      background: var(--navy-700);
+      color: #fff !important;
+    }
+
+    .nav-dd-wrap { position: relative; }
+
+    .nav-dd {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      min-width: 250px;
+      padding: 8px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow:
+        0 24px 48px -22px rgba(11, 29, 56, 0.35),
+        0 4px 12px -6px rgba(11, 29, 56, 0.08);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-50%) translateY(-6px);
+      transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+      z-index: 100;
+    }
+    .nav-dd::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; top: -12px;
+      height: 12px;
+    }
+    .nav-dd-sm { min-width: 215px; }
+
+    .nav-dd-wrap:hover .nav-dd,
+    .nav-dd-wrap:focus-within .nav-dd {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .dd-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: #47546B;
+      text-decoration: none;
+      transition: background 0.22s ease, color 0.22s ease;
+    }
+    .dd-item i {
+      width: 16px;
+      font-size: 0.72rem;
+      color: #9AA7B8;
+      text-align: center;
+      transition: color 0.22s ease;
+    }
+    .dd-item:hover {
+      color: var(--navy-800);
+      background: rgba(16, 42, 76, 0.06);
+    }
+    .dd-item:hover i { color: var(--navy-700); }
+
+    .hamburger-btn {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid var(--line);
+      transition: background 0.25s ease, border-color 0.25s ease;
+      flex-shrink: 0;
+    }
+    .hamburger-btn:hover {
+      background: rgba(16, 42, 76, 0.05);
+      border-color: #CBD9E8;
+    }
+
+    .h-line {
+      position: absolute;
+      width: 18px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--navy-800);
+      transition: transform 0.35s ease, opacity 0.25s ease;
+    }
+    .h-line:nth-child(1) { transform: translateY(-6px); }
+    .h-line:nth-child(3) { transform: translateY(6px); }
+
+    #mobileMenuBtn.open .h-line:nth-child(1) { transform: rotate(45deg); }
+    #mobileMenuBtn.open .h-line:nth-child(2) { transform: translateX(30px); opacity: 0; }
+    #mobileMenuBtn.open .h-line:nth-child(3) { transform: rotate(-45deg); }
+
+    .mobile-menu-wrap {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.45s ease, opacity 0.35s ease;
+    }
+    .mobile-menu-wrap.open {
+      max-height: 900px;
+      opacity: 1;
+    }
+
+    .mobile-menu-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 14px 0 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .m-item, .m-toggle {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #47546B;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.22s ease, color 0.22s ease;
+    }
+    .m-item i, .m-toggle i:not(.chev) {
+      width: 18px;
+      font-size: 0.85rem;
+      color: var(--navy-700);
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .m-item:hover, .m-toggle:hover {
+      background: rgba(16, 42, 76, 0.055);
+      color: var(--navy-800);
+    }
+
+    .m-item-cta {
+      justify-content: center;
+      margin-top: 6px;
+      color: #fff !important;
+      background: var(--navy-800);
+      box-shadow: 0 8px 18px -10px rgba(11, 29, 56, 0.6);
+    }
+    .m-item-cta i { color: #fff !important; }
+    .m-item-cta:hover {
+      background: var(--navy-700);
+      color: #fff !important;
+    }
+
+    .m-toggle .chev {
+      margin-left: auto;
+      font-size: 0.7rem;
+      color: #9AA7B8;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    .m-toggle.open .chev { transform: rotate(180deg); color: var(--navy-700); }
+
+    .m-sub {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      padding: 4px 0 6px 28px;
+    }
+    .m-sub a {
+      padding: 9px 14px;
+      border-radius: 6px;
+      border-left: 2px solid transparent;
+      font-size: 0.83rem;
+      color: var(--muted);
+      text-decoration: none;
+      transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+    }
+    .m-sub a:hover {
+      background: rgba(16, 42, 76, 0.05);
+      color: var(--navy-800);
+      border-left-color: var(--navy-700);
+    }
+
+    /* ============================================================
+       5. HAIRLINE DIVIDER
+       ============================================================ */
+    .hairline {
+      height: 1px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        var(--line) 12%,
+        var(--line) 88%,
+        transparent 100%);
+    }
+
+    /* ============================================================
+       6. HERO SLIDER
+       ============================================================ */
+    .hero-slider {
+      position: relative;
+      height: 600px;
+      overflow: hidden;
+      margin-bottom: 4rem;
+      box-shadow: 0 24px 60px -30px rgba(11, 29, 56, 0.45);
+      background: var(--navy-900);
+    }
+    @media (max-width: 640px) {
+      .hero-slider { height: 540px; }
+    }
+
+    /* Track */
+    .hero-track {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Slide */
+    .hero-slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+    }
+    .hero-slide.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    /* Zoom halus pada gambar slide aktif */
+    .hero-slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: inherit;
+      background-size: cover;
+      background-position: center;
+      transform: scale(1);
+      transition: transform 7s ease;
+    }
+    .hero-slide.active::before {
+      transform: scale(1.06);
+    }
+
+    .hero-slide-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg,
+        rgba(11, 29, 56, 0.93) 0%,
+        rgba(16, 42, 76, 0.82) 45%,
+        rgba(23, 58, 102, 0.58) 100%);
+      z-index: 1;
+    }
+
+    /* Konten slide */
+    .hero-slide-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: #fff;
+      padding: 0 4.5rem;
+    }
+    @media (max-width: 640px) {
+      .hero-slide-content { padding: 0 3.5rem; }
+    }
+
+    /* Animasi konten saat slide aktif */
+    .hero-slide .anim-item {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .hero-slide.active .anim-item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .hero-slide.active .anim-item.d1 { transition-delay: 0.15s; }
+    .hero-slide.active .anim-item.d2 { transition-delay: 0.30s; }
+    .hero-slide.active .anim-item.d3 { transition-delay: 0.45s; }
+    .hero-slide.active .anim-item.d4 { transition-delay: 0.60s; }
+
+    /* Tombol navigasi kiri/kanan */
+    .hero-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #fff;
+      font-size: 0.95rem;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+    }
+    .hero-nav-btn:hover {
+      background: rgba(255, 255, 255, 0.26);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+    .hero-nav-btn:active { transform: translateY(-50%) scale(0.94); }
+
+    .hero-nav-prev { left: 24px; }
+    .hero-nav-next { right: 24px; }
+
+    @media (max-width: 640px) {
+      .hero-nav-btn { width: 40px; height: 40px; font-size: 0.85rem; }
+      .hero-nav-prev { left: 12px; }
+      .hero-nav-next { right: 12px; }
+    }
+
+    /* Dot indicator */
+    .hero-dots {
+      position: absolute;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 5;
+      display: flex;
+      gap: 10px;
+    }
+    .hero-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      transition: background 0.3s ease, width 0.3s ease;
+    }
+    .hero-dot.active {
+      background: #fff;
+      width: 28px;
+      border-radius: 6px;
+    }
+    .hero-dot:hover {
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    /* Progress bar auto-play */
+    .hero-progress {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      width: 0;
+      background: linear-gradient(90deg, var(--steel-light), #fff);
+      z-index: 6;
+    }
+    .hero-progress.run {
+      animation: heroProgress 6s linear forwards;
+    }
+    @keyframes heroProgress {
+      from { width: 0; }
+      to   { width: 100%; }
+    }
+
+    /* ============================================================
+       7. CARDS
+       ============================================================ */
+    .glass-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: 0 1px 2px rgba(11, 29, 56, 0.04);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-4px);
+      border-color: #CBD9E8;
+      box-shadow: 0 20px 38px -22px rgba(11, 29, 56, 0.32);
+    }
+
+    /* ============================================================
+       8. ZIG-ZAG STAGGER
+       ============================================================ */
+    .zigzag { padding-bottom: 0; }
+
+    @media (min-width: 640px) and (max-width: 1023px) {
+      .zigzag { padding-bottom: 36px; }
+      .zigzag > *:nth-child(even) { margin-top: 36px; }
+    }
+    @media (min-width: 1024px) {
+      .zigzag { padding-bottom: 60px; }
+      .zigzag > *:nth-child(even) { margin-top: 60px; }
+    }
+
+    /* ============================================================
+       9. SECTION HEADING
+       ============================================================ */
+    .section-heading {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 10px;
+    }
+    .section-heading::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 2px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--navy-800), var(--navy-600));
+    }
+
+    /* ============================================================
+       10. FOOTER
+       ============================================================ */
+    .site-footer {
+      background: linear-gradient(165deg, #102A4C 0%, #0B1D38 100%);
+      color: #E6EDF5;
+    }
+
+    /* ============================================================
+       11. RESPONSIVE
+       ============================================================ */
+    @media (max-width: 1023px) {
+      .nav-inner { height: 68px; }
+      .logo-badge { width: 40px; height: 40px; font-size: 0.95rem; border-radius: 9px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .hero-slide::before { transform: none !important; }
+    }
+  </style>
+</head>
+
+<body class="antialiased">
+
+  <div id="scrollProgress"></div>
+
+  <!-- ================= NAVBAR ================= -->
+  <header id="navbar" class="site-header">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+      <nav class="nav-inner" aria-label="Navigasi utama">
+
+        <a href="index.html" class="brand-group">
+          <div class="logo-badge">
+            <i class="fas fa-fire-extinguisher"></i>
+          </div>
+          <div class="leading-tight">
+            <span class="block text-sm sm:text-base font-extrabold tracking-tight text-slate-800">Dinas Damkar</span>
+            <span class="block text-[8px] sm:text-[9px] font-semibold text-[#173A66] uppercase tracking-[0.15em] sm:tracking-[0.18em]">Pemadam &amp; Penyelamat</span>
+          </div>
+        </a>
+
+        <div class="hidden lg:flex items-center gap-1">
+          <a href="index.html" class="nav-item">Beranda</a>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item" type="button">
+              Profil PD <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd">
+              <a href="profile.html" class="dd-item"><i class="fas fa-user-tie"></i><span>Profil Pimpinan</span></a>
+              <a href="sejarah.html" class="dd-item"><i class="fas fa-book-open"></i><span>Sejarah</span></a>
+              <a href="struktur.html" class="dd-item"><i class="fas fa-sitemap"></i><span>Struktur Organisasi</span></a>
+              <a href="visimisi.html" class="dd-item"><i class="fas fa-compass"></i><span>Visi dan Misi</span></a>
+              <a href="tugas.html" class="dd-item"><i class="fas fa-list-check"></i><span>Tugas dan Fungsi</span></a>
+            </div>
+          </div>
+
+          <a href="program.html" class="nav-item">Program</a>
+          <a href="agenda.html" class="nav-item">Agenda Pimpinan</a>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item" type="button">
+              Publikasi <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd nav-dd-sm">
+              <a href="berita.html" class="dd-item"><i class="fas fa-newspaper"></i><span>Berita</span></a>
+              <a href="detail.html" class="dd-item"><i class="fas fa-file-lines"></i><span>Detail Berita</span></a>
+            </div>
+          </div>
+
+          <div class="nav-dd-wrap">
+            <button class="nav-item" type="button">
+              Dokumentasi <i class="fas fa-chevron-down"></i>
+            </button>
+            <div class="nav-dd nav-dd-sm">
+              <a href="galeri.html" class="dd-item"><i class="fas fa-images"></i><span>Galeri Foto</span></a>
+              <a href="video.html" class="dd-item"><i class="fas fa-video"></i><span>Video Kegiatan</span></a>
+            </div>
+          </div>
+
+          <a href="kritik.html" class="nav-item nav-item-cta">Kritik &amp; Saran</a>
+        </div>
+
+        <button id="mobileMenuBtn" class="lg:hidden hamburger-btn" aria-label="Buka menu" aria-expanded="false">
+          <span class="h-line"></span>
+          <span class="h-line"></span>
+          <span class="h-line"></span>
+        </button>
+      </nav>
+    </div>
+
+    <div id="mobileMenu" class="mobile-menu-wrap lg:hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mobile-menu-inner">
+          <a href="index.html" class="m-item"><i class="fas fa-home"></i> Beranda</a>
+
+          <div class="m-toggle" data-toggle="m-profil">
+            <i class="fas fa-building"></i> <span>Profil PD</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-profil" class="hidden m-sub">
+            <a href="profile.html">Profil Pimpinan</a>
+            <a href="sejarah.html">Sejarah</a>
+            <a href="struktur.html">Struktur Organisasi</a>
+            <a href="visimisi.html">Visi &amp; Misi</a>
+            <a href="tugas.html">Tugas &amp; Fungsi</a>
+          </div>
+
+          <a href="program.html" class="m-item"><i class="fas fa-clipboard-list"></i> Program</a>
+          <a href="agenda.html" class="m-item"><i class="fas fa-calendar-alt"></i> Agenda Pimpinan</a>
+
+          <div class="m-toggle" data-toggle="m-publikasi">
+            <i class="fas fa-bullhorn"></i> <span>Publikasi</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-publikasi" class="hidden m-sub">
+            <a href="berita.html">Berita</a>
+            <a href="detail.html">Detail Berita</a>
+          </div>
+
+          <div class="m-toggle" data-toggle="m-dok">
+            <i class="fas fa-camera"></i> <span>Dokumentasi</span>
+            <i class="fas fa-chevron-down chev"></i>
+          </div>
+          <div id="m-dok" class="hidden m-sub">
+            <a href="galeri.html">Galeri Foto</a>
+            <a href="video.html">Video Kegiatan</a>
+          </div>
+
+          <a href="kritik.html" class="m-item m-item-cta"><i class="fas fa-comment-dots"></i> Kritik &amp; Saran</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN ================= -->
+  <main class="w-full relative">
+
+    <!-- ================= HERO SLIDER ================= -->
+    <section class="hero-slider" id="heroSlider" aria-label="Sorotan utama" aria-roledescription="carousel">
+
+      <div class="hero-track">
+
+        <!-- SLIDE 1 -->
+        <div class="hero-slide active"
+             style="background-image: url('https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=2070&auto=format&fit=crop');">
+          <div class="hero-slide-overlay"></div>
+          <div class="hero-slide-content max-w-4xl mx-auto">
+            <span class="anim-item d1 text-xs font-semibold tracking-widest uppercase bg-[#173A66]/85 px-4 py-1.5 rounded-md mb-6 border border-white/20">
+              SIAP 24/7 &middot; RESPON CEPAT
+            </span>
+            <h1 class="anim-item d2 text-4xl md:text-6xl font-bold leading-tight mb-4">
+              Cepat Tanggap,<br>Selamatkan Nyawa
+            </h1>
+            <p class="anim-item d3 text-lg text-white/80 max-w-3xl mb-8">
+              Layanan pemadam kebakaran &amp; penyelamatan profesional dengan peralatan modern.
+              Melindungi masyarakat dari bahaya kebakaran dan bencana lainnya.
+            </p>
+            <div class="anim-item d4 flex flex-wrap gap-4 justify-center">
+              <a href="kritik.html" class="bg-white text-[#173A66] px-6 py-3 rounded-md font-semibold text-sm flex items-center gap-2 hover:bg-[#F1F5F9] transition shadow-lg shadow-black/20">
+                Layanan Darurat <i class="fas fa-phone-alt"></i>
+              </a>
+              <a href="program.html" class="bg-transparent border border-white/60 text-white px-6 py-3 rounded-md font-semibold text-sm hover:bg-white/20 transition">
+                Lihat Program
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 2 -->
+        <div class="hero-slide"
+             style="background-image: url('https://images.unsplash.com/photo-1558618666-fcd25c85eb94?q=80&w=2070&auto=format&fit=crop');">
+          <div class="hero-slide-overlay"></div>
+          <div class="hero-slide-content max-w-4xl mx-auto">
+            <span class="anim-item d1 text-xs font-semibold tracking-widest uppercase bg-[#173A66]/85 px-4 py-1.5 rounded-md mb-6 border border-white/20">
+              ARMADA MODERN &middot; PERSONEL TERLATIH
+            </span>
+            <h1 class="anim-item d2 text-4xl md:text-6xl font-bold leading-tight mb-4">
+              Peralatan Modern,<br>Kesiapan Nyata
+            </h1>
+            <p class="anim-item d3 text-lg text-white/80 max-w-3xl mb-8">
+              Didukung armada pemadam terkini dan personel bersertifikat untuk memastikan setiap
+              operasi penanggulangan berjalan cepat, aman, dan tepat sasaran.
+            </p>
+            <div class="anim-item d4 flex flex-wrap gap-4 justify-center">
+              <a href="program.html" class="bg-white text-[#173A66] px-6 py-3 rounded-md font-semibold text-sm flex items-center gap-2 hover:bg-[#F1F5F9] transition shadow-lg shadow-black/20">
+                Program Kami <i class="fas fa-fire-truck-moving"></i>
+              </a>
+              <a href="galeri.html" class="bg-transparent border border-white/60 text-white px-6 py-3 rounded-md font-semibold text-sm hover:bg-white/20 transition">
+                Lihat Galeri
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 3 -->
+        <div class="hero-slide"
+             style="background-image: url('https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2070&auto=format&fit=crop');">
+          <div class="hero-slide-overlay"></div>
+          <div class="hero-slide-content max-w-4xl mx-auto">
+            <span class="anim-item d1 text-xs font-semibold tracking-widest uppercase bg-[#173A66]/85 px-4 py-1.5 rounded-md mb-6 border border-white/20">
+              PENYELAMATAN &middot; KEMANUSIAAN
+            </span>
+            <h1 class="anim-item d2 text-4xl md:text-6xl font-bold leading-tight mb-4">
+              Selamatkan Jiwa,<br>Kapan Pun Dibutuhkan
+            </h1>
+            <p class="anim-item d3 text-lg text-white/80 max-w-3xl mb-8">
+              Tim rescue kami siap menangani berbagai situasi darurat — mulai dari kebakaran,
+              evakuasi, hingga penyelamatan di ketinggian maupun ruang terbatas.
+            </p>
+            <div class="anim-item d4 flex flex-wrap gap-4 justify-center">
+              <a href="berita.html" class="bg-white text-[#173A66] px-6 py-3 rounded-md font-semibold text-sm flex items-center gap-2 hover:bg-[#F1F5F9] transition shadow-lg shadow-black/20">
+                Berita Terbaru <i class="fas fa-newspaper"></i>
+              </a>
+              <a href="kritik.html" class="bg-transparent border border-white/60 text-white px-6 py-3 rounded-md font-semibold text-sm hover:bg-white/20 transition">
+                Hubungi Kami
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TOMBOL KIRI -->
+      <button class="hero-nav-btn hero-nav-prev" id="heroPrev" aria-label="Slide sebelumnya">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <!-- TOMBOL KANAN -->
+      <button class="hero-nav-btn hero-nav-next" id="heroNext" aria-label="Slide berikutnya">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+      <!-- DOT INDICATOR -->
+      <div class="hero-dots" id="heroDots" role="tablist" aria-label="Pilih slide">
+        <button class="hero-dot active" data-slide="0" aria-label="Slide 1" aria-selected="true"></button>
+        <button class="hero-dot" data-slide="1" aria-label="Slide 2" aria-selected="false"></button>
+        <button class="hero-dot" data-slide="2" aria-label="Slide 3" aria-selected="false"></button>
+      </div>
+
+      <!-- PROGRESS AUTO-PLAY -->
+      <div class="hero-progress" id="heroProgress"></div>
+    </section>
+
+    <!-- HAIRLINE DIVIDER -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-16">
+      <div class="hairline"></div>
+    </div>
+
+    <!-- SAMBUTAN KEPALA DINAS -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+      <div class="glass-card p-6 md:p-10 flex flex-col md:flex-row gap-8 items-center">
+        <div class="w-full md:w-1/3 flex-shrink-0">
+          <div class="aspect-square rounded-lg overflow-hidden shadow-lg border border-slate-200">
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1888&auto=format&fit=crop"
+                 alt="Kepala Dinas" class="w-full h-full object-cover">
+          </div>
+        </div>
+
+        <div class="w-full md:w-2/3 text-center md:text-left">
+          <p class="text-xs font-bold text-[#173A66] uppercase tracking-wider mb-2">Sambutan Kepala Dinas</p>
+          <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">
+            &ldquo;Kami siap melindungi dan melayani masyarakat dengan dedikasi tinggi 24 jam.&rdquo;
+          </h2>
+          <p class="text-slate-600 leading-relaxed mb-6">
+            Selamat datang di portal resmi Dinas Pemadam Kebakaran dan Penyelamatan. Kami berkomitmen
+            memberikan pelayanan terbaik dalam pencegahan dan penanggulangan bahaya kebakaran serta
+            penyelamatan jiwa. Dengan dukungan personel terlatih dan armada modern, kami siap siaga
+            untuk masyarakat.
+          </p>
+
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-200/70 pt-6">
+            <div>
+              <p class="font-bold text-slate-800">Drs. Ir. Bakti Nugraha, M.T.</p>
+              <p class="text-xs text-slate-500">Kepala Dinas Damkar &amp; Penyelamat</p>
+            </div>
+            <a href="profile.html"
+               class="bg-white border border-slate-200 text-slate-700 px-5 py-2 rounded-md text-sm font-semibold hover:bg-slate-50 transition flex items-center gap-2 shadow-sm">
+              Tentang Kami <i class="fas fa-user"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BERITA TERBARU (ZIG-ZAG) -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10">
+        <div>
+          <p class="text-xs font-bold text-[#173A66] uppercase tracking-wider mb-1">Komunikasi Publik</p>
+          <h2 class="text-3xl font-bold text-slate-800 section-heading">Berita Terbaru</h2>
+        </div>
+        <a href="berita.html"
+           class="mt-6 sm:mt-0 bg-white border border-slate-200 text-slate-700 px-5 py-2 rounded-md text-sm font-semibold hover:bg-slate-50 transition flex items-center gap-2 shadow-sm">
+          Lihat Semua Berita <i class="fas fa-archive"></i>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 zigzag">
+
+        <article class="glass-card flex flex-col">
+          <div class="h-48 bg-slate-200 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1913&auto=format&fit=crop"
+                 alt="Simulasi evakuasi gedung bertingkat" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-[#173A66] uppercase">Simulasi</span>
+              <span class="text-xs text-slate-400">12 Juni 2025</span>
+            </div>
+            <h3 class="font-bold text-slate-800 text-lg leading-snug mb-2">Simulasi Evakuasi Gedung Bertingkat</h3>
+            <p class="text-sm text-slate-500 flex-grow mb-4">
+              Melibatkan 150 peserta, simulasi berjalan lancar dan meningkatkan kesiapsiagaan penghuni gedung.
+            </p>
+            <a href="#" class="text-sm font-semibold text-slate-800 hover:text-[#173A66] transition flex items-center gap-1">
+              Baca Selengkapnya <i class="fas fa-chevron-right text-xs"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="glass-card flex flex-col">
+          <div class="h-48 bg-slate-200 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2070&auto=format&fit=crop"
+                 alt="Penyelamatan kucing di pohon" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-[#173A66] uppercase">Penyelamatan</span>
+              <span class="text-xs text-slate-400">10 Juni 2025</span>
+            </div>
+            <h3 class="font-bold text-slate-800 text-lg leading-snug mb-2">Penyelamatan Kucing di Pohon Tinggi</h3>
+            <p class="text-sm text-slate-500 flex-grow mb-4">
+              Tim rescue evakuasi kucing setinggi 15 meter dengan peralatan khusus dan penuh kehati-hatian.
+            </p>
+            <a href="#" class="text-sm font-semibold text-slate-800 hover:text-[#173A66] transition flex items-center gap-1">
+              Baca Selengkapnya <i class="fas fa-chevron-right text-xs"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="glass-card flex flex-col">
+          <div class="h-48 bg-slate-200 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=2072&auto=format&fit=crop"
+                 alt="Pengecekan hydrant pasar" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-[#173A66] uppercase">Inspeksi</span>
+              <span class="text-xs text-slate-400">9 Juni 2025</span>
+            </div>
+            <h3 class="font-bold text-slate-800 text-lg leading-snug mb-2">Cek Hydrant di Pasar Tradisional</h3>
+            <p class="text-sm text-slate-500 flex-grow mb-4">
+              Pengecekan rutin jelang musim kemarau untuk memastikan semua hydrant berfungsi optimal.
+            </p>
+            <a href="#" class="text-sm font-semibold text-slate-800 hover:text-[#173A66] transition flex items-center gap-1">
+              Baca Selengkapnya <i class="fas fa-chevron-right text-xs"></i>
+            </a>
+          </div>
+        </article>
+
+        <article class="glass-card flex flex-col">
+          <div class="h-48 bg-slate-200 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1588612466924-ef3b0e6a60b1?q=80&w=2070&auto=format&fit=crop"
+                 alt="Pelatihan damkar untuk relawan" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+          </div>
+          <div class="p-5 flex flex-col flex-grow">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-[#173A66] uppercase">Diklat</span>
+              <span class="text-xs text-slate-400">8 Juni 2025</span>
+            </div>
+            <h3 class="font-bold text-slate-800 text-lg leading-snug mb-2">Pelatihan Damkar untuk Relawan</h3>
+            <p class="text-sm text-slate-500 flex-grow mb-4">
+              Tingkatkan kapasitas relawan di lingkungan padat penduduk untuk tanggap darurat.
+            </p>
+            <a href="#" class="text-sm font-semibold text-slate-800 hover:text-[#173A66] transition flex items-center gap-1">
+              Baca Selengkapnya <i class="fas fa-chevron-right text-xs"></i>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- AGENDA PIMPINAN (ZIG-ZAG) -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10">
+        <div>
+          <p class="text-xs font-bold text-[#173A66] uppercase tracking-wider mb-1">Kalender Strategis</p>
+          <h2 class="text-3xl font-bold text-slate-800 section-heading">Agenda Pimpinan</h2>
+        </div>
+        <a href="agenda.html"
+           class="mt-6 sm:mt-0 bg-white border border-slate-200 text-slate-700 px-5 py-2 rounded-md text-sm font-semibold hover:bg-slate-50 transition flex items-center gap-2 shadow-sm">
+          Lihat Semua Agenda <i class="fas fa-calendar-plus"></i>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 zigzag">
+
+        <div class="glass-card p-6 flex flex-col">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="bg-[#F1F5F9] rounded-md p-3 text-center min-w-[70px] border border-[#E3E9F1]">
+              <span class="block text-xs font-bold text-[#173A66] uppercase">Jun</span>
+              <span class="block text-2xl font-extrabold text-slate-800">15</span>
+            </div>
+            <div class="text-xs font-semibold text-slate-500 uppercase mt-1">Terbuka untuk umum</div>
+          </div>
+          <h3 class="font-bold text-slate-800 text-lg mb-4">Rapat Koordinasi Kesiapsiagaan</h3>
+          <div class="space-y-2 text-sm text-slate-500 flex-grow">
+            <p class="flex items-center gap-2"><i class="far fa-clock text-slate-400"></i> 09.00 – 11.00 WIB</p>
+            <p class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-400"></i> Aula Utama Dinas Damkar</p>
+          </div>
+          <a href="#" class="text-sm font-semibold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-4">
+            Daftar Hadir <i class="fas fa-arrow-up-right-from-square text-xs"></i>
+          </a>
+        </div>
+
+        <div class="glass-card p-6 flex flex-col">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="bg-[#F1F5F9] rounded-md p-3 text-center min-w-[70px] border border-[#E3E9F1]">
+              <span class="block text-xs font-bold text-[#173A66] uppercase">Jun</span>
+              <span class="block text-2xl font-extrabold text-slate-800">18</span>
+            </div>
+            <div class="text-xs font-semibold text-slate-500 uppercase mt-1">Terbuka untuk umum</div>
+          </div>
+          <h3 class="font-bold text-slate-800 text-lg mb-4">Kunjungan ke Pos Sektor V</h3>
+          <div class="space-y-2 text-sm text-slate-500 flex-grow">
+            <p class="flex items-center gap-2"><i class="far fa-clock text-slate-400"></i> 13.30 – 15.00 WIB</p>
+            <p class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-400"></i> Pos Damkar Sektor V</p>
+          </div>
+          <a href="#" class="text-sm font-semibold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-4">
+            Daftar Hadir <i class="fas fa-arrow-up-right-from-square text-xs"></i>
+          </a>
+        </div>
+
+        <div class="glass-card p-6 flex flex-col">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="bg-[#F1F5F9] rounded-md p-3 text-center min-w-[70px] border border-[#E3E9F1]">
+              <span class="block text-xs font-bold text-[#173A66] uppercase">Jun</span>
+              <span class="block text-2xl font-extrabold text-slate-800">22</span>
+            </div>
+            <div class="text-xs font-semibold text-slate-500 uppercase mt-1">Terbuka untuk umum</div>
+          </div>
+          <h3 class="font-bold text-slate-800 text-lg mb-4">Apel Siaga Bencana Kota</h3>
+          <div class="space-y-2 text-sm text-slate-500 flex-grow">
+            <p class="flex items-center gap-2"><i class="far fa-clock text-slate-400"></i> 07.00 – 09.00 WIB</p>
+            <p class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-400"></i> Lapangan Utama Kota</p>
+          </div>
+          <a href="#" class="text-sm font-semibold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-4">
+            Daftar Hadir <i class="fas fa-arrow-up-right-from-square text-xs"></i>
+          </a>
+        </div>
+
+        <div class="glass-card p-6 flex flex-col">
+          <div class="flex items-start gap-4 mb-4">
+            <div class="bg-[#F1F5F9] rounded-md p-3 text-center min-w-[70px] border border-[#E3E9F1]">
+              <span class="block text-xs font-bold text-[#173A66] uppercase">Jun</span>
+              <span class="block text-2xl font-extrabold text-slate-800">25</span>
+            </div>
+            <div class="text-xs font-semibold text-slate-500 uppercase mt-1">Terbuka untuk umum</div>
+          </div>
+          <h3 class="font-bold text-slate-800 text-lg mb-4">Seminar Pencegahan Kebakaran</h3>
+          <div class="space-y-2 text-sm text-slate-500 flex-grow">
+            <p class="flex items-center gap-2"><i class="far fa-clock text-slate-400"></i> 10.00 – 12.00 WIB</p>
+            <p class="flex items-center gap-2"><i class="fas fa-map-marker-alt text-slate-400"></i> Gedung Serbaguna</p>
+          </div>
+          <a href="#" class="text-sm font-semibold text-[#173A66] hover:text-[#0B1D38] transition flex items-center gap-1 mt-4">
+            Daftar Hadir <i class="fas fa-arrow-up-right-from-square text-xs"></i>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- DOKUMENTASI (ZIG-ZAG) -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 mb-12">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-10">
+        <div>
+          <p class="text-xs font-bold text-[#173A66] uppercase tracking-wider mb-1">Galeri Kegiatan</p>
+          <h2 class="text-3xl font-bold text-slate-800 section-heading">Dokumentasi Terbaru</h2>
+        </div>
+        <a href="galeri.html"
+           class="mt-6 sm:mt-0 bg-white border border-slate-200 text-slate-700 px-5 py-2 rounded-md text-sm font-semibold hover:bg-slate-50 transition flex items-center gap-2 shadow-sm">
+          Lihat Galeri <i class="fas fa-images"></i>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 zigzag">
+
+        <div class="glass-card aspect-square group relative">
+          <img src="https://images.unsplash.com/photo-1582139329536-e7284fece509?q=80&w=1974&auto=format&fit=crop"
+               alt="Simulasi evakuasi" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0B1D38]/80 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+            <span class="text-white text-sm font-semibold">Simulasi Evakuasi</span>
+          </div>
+        </div>
+
+        <div class="glass-card aspect-square group relative">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85eb94?q=80&w=1974&auto=format&fit=crop"
+               alt="Armada modern" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0B1D38]/80 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+            <span class="text-white text-sm font-semibold">Armada Modern</span>
+          </div>
+        </div>
+
+        <div class="glass-card aspect-square group relative">
+          <img src="https://images.unsplash.com/photo-1605833556294-ea5c7c53179c?q=80&w=1974&auto=format&fit=crop"
+               alt="Penyelamatan" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0B1D38]/80 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+            <span class="text-white text-sm font-semibold">Penyelamatan</span>
+          </div>
+        </div>
+
+        <div class="glass-card aspect-square group relative">
+          <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=2070&auto=format&fit=crop"
+               alt="Diklat damkar" class="w-full h-full object-cover group-hover:scale-105 transition duration-700">
+          <div class="absolute inset-0 bg-gradient-to-t from-[#0B1D38]/80 to-transparent opacity-0 group-hover:opacity-100 transition duration-300 flex items-end p-4">
+            <span class="text-white text-sm font-semibold">Diklat Damkar</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="site-footer pt-16 pb-8 relative z-10">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-lg bg-white/10 border border-white/15 flex items-center justify-center text-white">
+              <i class="fas fa-fire-extinguisher text-xl"></i>
+            </div>
+            <div>
+              <span class="block text-lg font-bold tracking-tight">Dinas Damkar</span>
+              <span class="block text-[10px] font-semibold text-[#9FB6CE] uppercase tracking-wider">Pemadam &amp; Penyelamat</span>
+            </div>
+          </div>
+          <p class="text-sm text-[#C6D5E5] leading-relaxed">
+            Melayani dengan dedikasi dan kemanusiaan. Siap 24/7 untuk melindungi masyarakat
+            dari bahaya kebakaran dan bencana lainnya.
+          </p>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Hubungi Kami</h3>
+          <ul class="space-y-3 text-sm text-[#C6D5E5]">
+            <li class="flex items-start gap-3">
+              <i class="fas fa-map-marker-alt text-[#7FA3C7] mt-1"></i>
+              <span>Jl. Merdeka No. 123, Kota Sejahtera,<br>Provinsi Makmur, 12345</span>
+            </li>
+            <li class="flex items-center gap-3"><i class="fas fa-phone-alt text-[#7FA3C7]"></i><span>(021) 123-4567</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-envelope text-[#7FA3C7]"></i><span>info@damkar.go.id</span></li>
+            <li class="flex items-center gap-3"><i class="fas fa-clock text-[#7FA3C7]"></i><span>Layanan Darurat: 24 Jam</span></li>
+          </ul>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Ikuti Kami</h3>
+          <p class="text-sm text-[#C6D5E5] mb-4">
+            Dapatkan informasi terbaru seputar kegiatan dan layanan darurat melalui media sosial kami.
+          </p>
+          <div class="flex space-x-3">
+            <a href="#" aria-label="Facebook" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Twitter" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="YouTube" class="w-10 h-10 rounded-md bg-white/10 border border-white/15 flex items-center justify-center hover:bg-[#215083] hover:border-[#215083] transition duration-300"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold mb-4">Tautan Cepat</h3>
+          <ul class="space-y-2 text-sm text-[#C6D5E5]">
+            <li><a href="index.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Beranda</a></li>
+            <li><a href="profile.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Profil Dinas</a></li>
+            <li><a href="program.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Program Kerja</a></li>
+            <li><a href="berita.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Berita &amp; Agenda</a></li>
+            <li><a href="kritik.html" class="hover:text-white transition flex items-center gap-2"><i class="fas fa-chevron-right text-[10px]"></i> Kritik &amp; Saran</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="border-t border-white/12 pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-[#9FB6CE]">
+        <p>&copy; 2026 Dinas Pemadam Kebakaran dan Penyelamatan. Hak Cipta Dilindungi.</p>
+        <div class="flex space-x-6 mt-4 md:mt-0">
+          <a href="#" class="hover:text-white transition">Kebijakan Privasi</a>
+          <a href="#" class="hover:text-white transition">Syarat &amp; Ketentuan</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= SCRIPT ================= -->
+  <script>
+    /* ---------- Navbar + Scroll Progress ---------- */
+    const navbar = document.getElementById('navbar');
+    const progressBar = document.getElementById('scrollProgress');
+
+    const onScroll = () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const percent = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+      progressBar.style.width = percent + '%';
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    /* ---------- Mobile Menu ---------- */
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    mobileMenuBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('open');
+      mobileMenuBtn.classList.toggle('open', isOpen);
+      mobileMenuBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('open');
+        mobileMenuBtn.classList.remove('open');
+        mobileMenuBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.querySelectorAll('[data-toggle]').forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const target = document.getElementById(trigger.dataset.toggle);
+        if (!target) return;
+        target.classList.toggle('hidden');
+        trigger.classList.toggle('open');
+      });
+    });
+
+    /* ============================================================
+       HERO SLIDER
+       ============================================================ */
+    const slides   = document.querySelectorAll('.hero-slide');
+    const dots     = document.querySelectorAll('.hero-dot');
+    const prevBtn  = document.getElementById('heroPrev');
+    const nextBtn  = document.getElementById('heroNext');
+    const progress = document.getElementById('heroProgress');
+    const slider   = document.getElementById('heroSlider');
+
+    const AUTOPLAY_MS = 6000; // durasi auto-play per slide
+    let currentIndex = 0;
+    let autoplayTimer = null;
+
+    function goToSlide(index) {
+      // wrap index
+      currentIndex = (index + slides.length) % slides.length;
+
+      slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentIndex);
+      });
+      dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentIndex);
+        dot.setAttribute('aria-selected', String(i === currentIndex));
+      });
+
+      restartProgress();
+    }
+
+    function nextSlide() { goToSlide(currentIndex + 1); }
+    function prevSlide() { goToSlide(currentIndex - 1); }
+
+    /* Progress bar (indikator auto-play) */
+    function restartProgress() {
+      if (!progress) return;
+      progress.classList.remove('run');
+      // trigger reflow supaya animasi bisa restart
+      void progress.offsetWidth;
+      progress.classList.add('run');
+    }
+
+    /* Auto-play */
+    function startAutoplay() {
+      stopAutoplay();
+      autoplayTimer = setInterval(nextSlide, AUTOPLAY_MS);
+    }
+    function stopAutoplay() {
+      if (autoplayTimer) {
+        clearInterval(autoplayTimer);
+        autoplayTimer = null;
+      }
+      if (progress) progress.classList.remove('run');
+    }
+
+    /* Event listeners */
+    prevBtn.addEventListener('click', () => { prevSlide(); startAutoplay(); });
+    nextBtn.addEventListener('click', () => { nextSlide(); startAutoplay(); });
+
+    dots.forEach(dot => {
+      dot.addEventListener('click', () => {
+        goToSlide(parseInt(dot.dataset.slide, 10));
+        startAutoplay();
+      });
+    });
+
+    /* Pause saat hover / fokus */
+    slider.addEventListener('mouseenter', stopAutoplay);
+    slider.addEventListener('mouseleave', startAutoplay);
+    slider.addEventListener('focusin',  stopAutoplay);
+    slider.addEventListener('focusout', startAutoplay);
+
+    /* Navigasi keyboard */
+    document.addEventListener('keydown', (e) => {
+      // hanya aktif kalau slider terlihat
+      const rect = slider.getBoundingClientRect();
+      const visible = rect.top < window.innerHeight && rect.bottom > 0;
+      if (!visible) return;
+
+      if (e.key === 'ArrowLeft')  { prevSlide(); startAutoplay(); }
+      if (e.key === 'ArrowRight') { nextSlide(); startAutoplay(); }
+    });
+
+    /* Swipe (mobile) */
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    slider.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    slider.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+
+    function handleSwipe() {
+      const distance = touchEndX - touchStartX;
+      if (Math.abs(distance) < 50) return; // abaikan geseran kecil
+      if (distance < 0) nextSlide();
+      else prevSlide();
+      startAutoplay();
+    }
+
+    /* Inisialisasi */
+    goToSlide(0);
+    startAutoplay();
+
+    /* Hentikan autoplay kalau tab tidak aktif (hemat resource) */
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopAutoplay();
+      else startAutoplay();
+    });
+  </script>
+</body>
+</html>
